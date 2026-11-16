@@ -35,4 +35,16 @@ return [
         ],
     ],
 
+    'google_books' => [
+        'base_url' => env('GOOGLE_BOOKS_BASE_URL', 'https://www.googleapis.com/books/v1'),
+        'key' => env('GOOGLE_BOOKS_API_KEY'),
+        'timeout' => (int) env('GOOGLE_BOOKS_TIMEOUT', 8),
+    ],
+
+    'open_library' => [
+        'base_url' => env('OPEN_LIBRARY_BASE_URL', 'https://openlibrary.org'),
+        'covers_url' => env('OPEN_LIBRARY_COVERS_URL', 'https://covers.openlibrary.org'),
+        'timeout' => (int) env('OPEN_LIBRARY_TIMEOUT', 8),
+    ],
+
 ];
