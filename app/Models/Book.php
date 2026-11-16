@@ -20,7 +20,7 @@ class Book extends Model
         'title', 'subtitle', 'authors', 'publisher', 'isbn10', 'isbn13', 'edition',
         'publication_year', 'pages', 'description', 'cover_url', 'language', 'format',
         'work_id', 'collection_group', 'material_type', 'audience', 'education_stage',
-        'collection_id', 'archived_at',
+        'collection_id', 'archived_at', 'demo_batch',
     ];
 
     protected function casts(): array
@@ -141,6 +141,9 @@ class Book extends Model
             ->when(! ($filters['archived'] ?? false), fn (Builder $q) => $q->active())
             ->search($filters['q'] ?? null)
             ->when($filters['category'] ?? null, fn (Builder $q, $id) => $q->whereHas('categories', fn (Builder $c) => $c->where('categories.id', $id)))
+            ->when($filters['discipline'] ?? null, fn (Builder $q, $id) => $q->whereHas('categories', fn (Builder $c) => $c->where('categories.id', $id)->where('categories.type', 'discipline')))
+            ->when($filters['subject'] ?? null, fn (Builder $q, $id) => $q->whereHas('categories', fn (Builder $c) => $c->where('categories.id', $id)->whereIn('categories.type', ['subject', 'theme'])))
+            ->when($filters['genre'] ?? null, fn (Builder $q, $id) => $q->whereHas('categories', fn (Builder $c) => $c->where('categories.id', $id)->where('categories.type', 'genre')))
             ->when($filters['publisher'] ?? null, fn (Builder $q, $v) => $q->where('publisher', $v))
             ->when($filters['year'] ?? null, fn (Builder $q, $v) => $q->where('publication_year', $v))
             ->when($filters['collection'] ?? null, fn (Builder $q, $v) => $q->where('collection_id', $v))

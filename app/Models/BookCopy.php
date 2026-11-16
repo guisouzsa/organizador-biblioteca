@@ -15,7 +15,7 @@ class BookCopy extends Model
 {
     protected $fillable = [
         'book_id', 'accession_number', 'location_id', 'status', 'condition', 'acquired_at',
-        'acquisition_source', 'notes', 'status_reason', 'status_changed_at',
+        'acquisition_source', 'notes', 'status_reason', 'status_changed_at', 'demo_batch',
     ];
 
     protected function casts(): array

@@ -11,7 +11,7 @@ class Reservation extends Model
 {
     protected $fillable = [
         'book_id', 'borrower_id', 'status', 'requested_at', 'copy_id', 'ready_at', 'expires_at',
-        'fulfilled_loan_id', 'cancelled_by', 'cancel_reason', 'created_by',
+        'fulfilled_loan_id', 'cancelled_by', 'cancel_reason', 'created_by', 'demo_batch',
     ];
 
     protected function casts(): array

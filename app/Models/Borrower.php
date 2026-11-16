@@ -16,7 +16,7 @@ class Borrower extends Model
 
     protected $fillable = [
         'type', 'name', 'registration_number', 'class_group', 'email', 'phone',
-        'status', 'status_changed_at', 'user_id', 'anonymized_at',
+        'status', 'status_changed_at', 'user_id', 'anonymized_at', 'demo_batch',
     ];
 
     protected function casts(): array

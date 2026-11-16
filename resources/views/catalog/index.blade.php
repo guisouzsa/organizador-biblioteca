@@ -53,12 +53,24 @@
                     </select>
                 </div>
                 <div>
-                    <label for="category" class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Classificação</label>
-                    <select id="category" name="category" class="field">
+                    <label for="discipline" class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Disciplina</label>
+                    <select id="discipline" name="discipline" class="field">
                         <option value="">Todas</option>
-                        @foreach ($categories as $category)
-                            <option value="{{ $category->id }}" @selected(($filters['category'] ?? null) == $category->id)>{{ $category->name }}</option>
+                        @foreach ($disciplines as $category)
+                            <option value="{{ $category->id }}" @selected(($filters['discipline'] ?? null) == $category->id)>{{ $category->name }}</option>
                         @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="genre" class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Gênero</label>
+                    <select id="genre" name="genre" class="field"><option value="">Todos</option>
+                        @foreach ($genres as $category)<option value="{{ $category->id }}" @selected(($filters['genre'] ?? null) == $category->id)>{{ $category->name }}</option>@endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="subject" class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Assunto</label>
+                    <select id="subject" name="subject" class="field"><option value="">Todos</option>
+                        @foreach ($subjects as $category)<option value="{{ $category->id }}" @selected(($filters['subject'] ?? null) == $category->id)>{{ $category->name }}</option>@endforeach
                     </select>
                 </div>
                 <div>

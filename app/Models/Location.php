@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Location extends Model
 {
-    protected $fillable = ['name', 'code', 'parent_id', 'active'];
+    protected $fillable = ['name', 'code', 'parent_id', 'active', 'demo_batch'];
 
     protected function casts(): array
     {

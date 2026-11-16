@@ -12,7 +12,7 @@ class Loan extends Model
 {
     protected $fillable = [
         'copy_id', 'borrower_id', 'loaned_by', 'loaned_at', 'due_on', 'returned_at',
-        'returned_by', 'outcome', 'loan_rule_id', 'notes',
+        'returned_by', 'outcome', 'loan_rule_id', 'notes', 'demo_batch',
     ];
 
     protected function casts(): array

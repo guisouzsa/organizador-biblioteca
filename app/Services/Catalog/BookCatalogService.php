@@ -7,6 +7,7 @@ use App\Enums\ErrorCode;
 use App\Exceptions\Domain\DomainException;
 use App\Models\Book;
 use App\Models\BookSource;
+use App\Models\BookWork;
 use App\Models\Category;
 use App\Services\Admin\AuditLogger;
 use Illuminate\Support\Collection;
@@ -64,7 +65,9 @@ class BookCatalogService
     public function create(BookData $data, array $sources = []): Book
     {
         return DB::transaction(function () use ($data, $sources) {
-            $book = Book::create($data->attributes());
+            $attributes = $data->attributes();
+            $attributes['work_id'] ??= $this->resolveWork($data)->id;
+            $book = Book::create($attributes);
             $this->syncCategories($book, $data);
             $this->recordSources($book, $sources);
             $this->audit->record('book.created', $book, [], $data->attributes());
@@ -83,7 +86,9 @@ class BookCatalogService
         return DB::transaction(function () use ($book, $data, $sources) {
             $before = $this->snapshot($book);
 
-            $book->update($data->attributes());
+            $attributes = $data->attributes();
+            $attributes['work_id'] ??= $book->work_id ?: $this->resolveWork($data)->id;
+            $book->update($attributes);
             $this->syncCategories($book, $data);
             $this->recordSources($book, $sources);
 
@@ -94,6 +99,14 @@ class BookCatalogService
 
             return $book;
         });
+    }
+
+    private function resolveWork(BookData $data): BookWork
+    {
+        return BookWork::firstOrCreate(
+            ['preferred_title' => $data->title, 'authors' => $data->authors],
+            ['original_language' => $data->language, 'description' => $data->description],
+        );
     }
 
     public function archive(Book $book): void
@@ -179,9 +192,8 @@ class BookCatalogService
 
         foreach ($sources as $source) {
             $book->sources()->updateOrCreate(
-                ['provider' => $source['provider']],
+                ['provider' => $source['provider'], 'external_id' => $source['external_id'] ?? null],
                 [
-                    'external_id' => $source['external_id'] ?? null,
                     'source_url' => $source['source_url'] ?? null,
                     'retrieved_at' => now(),
                     'raw_metadata' => $source['raw'] ?? null,
