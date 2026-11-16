@@ -8,7 +8,7 @@
 
 <header class="border-b border-slate-200 bg-white">
     <x-layout.container class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-3">
-        <a href="{{ route('books.index') }}" class="text-lg font-semibold tracking-tight">{{ config('app.name') }}</a>
+        <a href="{{ route('books.index') }}" class="inline-block py-1.5 text-lg font-semibold tracking-tight">{{ config('app.name') }}</a>
 
         <nav aria-label="Principal" class="flex flex-wrap gap-1">
             @foreach ($links as $link)

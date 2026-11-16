@@ -20,7 +20,7 @@
 
 @section('content')
     <nav aria-label="Navegação estrutural" class="mb-4 text-sm">
-        <a href="{{ route('books.index') }}" class="text-indigo-700 hover:underline">← Voltar ao catálogo</a>
+        <a href="{{ route('books.index') }}" class="inline-block py-2 text-indigo-700 hover:underline">← Voltar ao catálogo</a>
     </nav>
 
     <article class="grid gap-8 md:grid-cols-[auto_1fr]">
