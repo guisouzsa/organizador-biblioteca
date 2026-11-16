@@ -13,7 +13,7 @@ class GoogleBooksService
     public function __construct(private IsbnValidatorService $isbn) {}
 
     /**
-     * @return array<string, mixed>|null  null quando o ISBN não é encontrado
+     * @return array<string, mixed>|null null quando o ISBN não é encontrado
      *
      * @throws ExternalLookupException
      */
