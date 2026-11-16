@@ -11,7 +11,8 @@ Route::prefix('catalogo')->name('books.')->group(function () {
     Route::get('/', [BookController::class, 'index'])->name('index');
     Route::get('novo', [BookController::class, 'create'])->name('create');
     Route::get('scanner', [ScannerController::class, 'index'])->name('scanner');
-    Route::post('isbn', IsbnLookupController::class)->name('lookup');
+    // Limite por IP: protege a cota das APIs externas (o sistema ainda não tem autenticação).
+    Route::post('isbn', IsbnLookupController::class)->middleware('throttle:30,1')->name('lookup');
     Route::post('/', [BookController::class, 'store'])->name('store');
 
     Route::get('{book}', [BookController::class, 'show'])->whereNumber('book')->name('show');

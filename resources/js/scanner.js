@@ -187,6 +187,10 @@ function initScanner(root) {
                 setState('error', 'ISBN inválido. Confira o número e tente novamente.');
                 return;
             }
+            if (response.status === 429) {
+                setState('error', 'Muitas consultas seguidas. Aguarde cerca de um minuto e tente de novo.');
+                return;
+            }
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }

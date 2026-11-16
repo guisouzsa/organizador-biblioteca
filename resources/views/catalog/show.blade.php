@@ -67,7 +67,7 @@
                                 <p class="font-medium">{{ \App\Models\BookSource::providerLabel($source->provider) }}</p>
                                 <p class="text-xs text-slate-500">
                                     @if ($source->retrieved_at) Consultado em {{ $source->retrieved_at->format('d/m/Y H:i') }} @endif
-                                    @if ($source->source_url) · <a href="{{ $source->source_url }}" target="_blank" rel="noopener noreferrer" class="text-indigo-700 underline">ver origem</a> @endif
+                                    @if (preg_match('#^https?://#i', (string) $source->source_url)) ·<a href="{{ $source->source_url }}" target="_blank" rel="noopener noreferrer" class="text-indigo-700 underline">ver origem</a> @endif
                                 </p>
                             </div>
                             <span class="rounded-full px-2.5 py-1 text-xs font-medium {{ $source->verification_status === 'confirmed' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700' }}">

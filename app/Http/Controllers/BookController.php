@@ -9,6 +9,7 @@ use App\Models\BookCollection;
 use App\Models\Category;
 use App\Services\BookCatalogService;
 use App\Services\BookLookupService;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -74,7 +75,14 @@ class BookController extends Controller
             return redirect()->route('books.show', $duplicate)->with('status', 'Registro existente atualizado com os novos dados.');
         }
 
-        $book = $this->catalog->create($data, $sources);
+        try {
+            $book = $this->catalog->create($data, $sources);
+        } catch (UniqueConstraintViolationException) {
+            // Envio duplo/concorrente do mesmo ISBN: a restrição única do banco é a garantia final.
+            $existing = $this->catalog->findDuplicate($data['isbn13'], $data['isbn10']);
+
+            return back()->withInput()->with('duplicate_book_id', $existing?->id);
+        }
 
         return redirect()->route('books.show', $book)->with('status', 'Livro cadastrado no catálogo.');
     }
