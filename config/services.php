@@ -45,6 +45,14 @@ return [
         'base_url' => env('OPEN_LIBRARY_BASE_URL', 'https://openlibrary.org'),
         'covers_url' => env('OPEN_LIBRARY_COVERS_URL', 'https://covers.openlibrary.org'),
         'timeout' => (int) env('OPEN_LIBRARY_TIMEOUT', 8),
+        'user_agent' => env('OPEN_LIBRARY_USER_AGENT', 'BibliotecaEscolar/1.0'),
+        'contact' => env('OPEN_LIBRARY_CONTACT'),
+    ],
+
+    'ocr' => [
+        'binary' => env('OCR_BINARY', 'tesseract'),
+        'language' => env('OCR_LANGUAGE', 'por+eng'),
+        'timeout' => (int) env('OCR_TIMEOUT', 20),
     ],
 
 ];

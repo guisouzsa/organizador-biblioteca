@@ -17,7 +17,7 @@ Data: 2026-11-16. Escopo: catálogo (sem exemplares, empréstimos ou alunos).
 | Interface em 3 tamanhos | — | — | — | — | ✅ Chrome | ❌ |
 
 **Supabase:** `DB_HOST`, `DB_USERNAME` e `DB_PASSWORD` seguem vazios; `php artisan db:check-connection` retorna
-"NÃO VALIDADO". Nada foi executado no banco remoto.
+"N�O VALIDADO". Nada foi executado no banco remoto.
 
 ## 2. Diferenças SQLite × PostgreSQL
 

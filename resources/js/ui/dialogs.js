@@ -4,7 +4,7 @@
  * Usa o elemento nativo <dialog> com showModal(): o navegador cuida de prender o foco dentro do
  * modal, tornar o restante da página inerte e fechar com Esc. Aqui acrescentamos: foco inicial correto,
  * devolução do foco, bloqueio de rolagem, fila de modais, ações dinâmicas e prevenção de clique acidental
- * no fundo (clicar fora NÃO fecha).
+ * no fundo (clicar fora N�O fecha).
  *
  * API global (window.UI), usada também pelo scanner:
  *   UI.show({ tone, title, message, actions, persistent, focus }) → Promise<valor da ação>

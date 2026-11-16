@@ -5,15 +5,53 @@ namespace App\Services\Catalog;
 use App\Exceptions\ExternalLookupException;
 use App\Models\BookSource;
 use App\Services\Catalog\Concerns\SanitizesExternalData;
+use App\Services\Catalog\Contracts\BibliographicProvider;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 
 /** Consulta o Google Books por ISBN e normaliza o resultado. */
-class GoogleBooksService
+class GoogleBooksService implements BibliographicProvider
 {
     use SanitizesExternalData;
 
     public function __construct(private IsbnValidatorService $isbn) {}
+
+    public function name(): string
+    {
+        return BookSource::PROVIDER_GOOGLE_BOOKS;
+    }
+
+    public function search(string $query, int $limit = 10): array
+    {
+        $query = trim($query);
+        if ($query === '') {
+            return [];
+        }
+
+        $config = config('services.google_books');
+        $parameters = ['q' => $query, 'maxResults' => max(1, min($limit, 40)), 'printType' => 'books'];
+        if (filled($config['key'] ?? null)) {
+            $parameters['key'] = $config['key'];
+        }
+
+        try {
+            $response = Http::timeout($config['timeout'] ?? 8)->acceptJson()
+                ->get(rtrim($config['base_url'], '/').'/volumes', $parameters);
+        } catch (ConnectionException) {
+            throw new ExternalLookupException('Google Books indisponível (falha de conexão ou tempo esgotado).');
+        }
+
+        if ($response->status() === 429) {
+            throw new ExternalLookupException('Google Books: limite de requisições atingido (HTTP 429).');
+        }
+        if ($response->failed() || ! is_array($response->json())) {
+            throw new ExternalLookupException('Google Books não retornou uma resposta válida.');
+        }
+
+        return collect($response->json('items', []))->filter(fn ($item) => is_array($item))
+            ->map(fn (array $item) => $this->normalize($item, ''))
+            ->filter(fn (array $item) => filled($item['title']))->values()->all();
+    }
 
     /**
      * @return array<string, mixed>|null null quando o ISBN não é encontrado

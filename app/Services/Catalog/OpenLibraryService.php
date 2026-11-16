@@ -5,17 +5,74 @@ namespace App\Services\Catalog;
 use App\Exceptions\ExternalLookupException;
 use App\Models\BookSource;
 use App\Services\Catalog\Concerns\SanitizesExternalData;
+use App\Services\Catalog\Contracts\BibliographicProvider;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 
 /** Consulta o Open Library por ISBN (edição) e normaliza o resultado. */
-class OpenLibraryService
+class OpenLibraryService implements BibliographicProvider
 {
     use SanitizesExternalData;
 
     private const MAX_AUTHOR_LOOKUPS = 4;
 
     public function __construct(private IsbnValidatorService $isbn) {}
+
+    public function name(): string
+    {
+        return BookSource::PROVIDER_OPEN_LIBRARY;
+    }
+
+    public function search(string $query, int $limit = 10): array
+    {
+        $query = trim($query);
+        if ($query === '') {
+            return [];
+        }
+
+        $config = config('services.open_library');
+        try {
+            $response = $this->client($config['timeout'] ?? 8)->get(rtrim($config['base_url'], '/').'/search.json', [
+                'q' => $query,
+                'limit' => max(1, min($limit, 25)),
+                'fields' => 'key,title,subtitle,author_name,publisher,first_publish_year,isbn,language,cover_i,edition_key',
+            ]);
+        } catch (ConnectionException) {
+            throw new ExternalLookupException('Open Library indisponível (falha de conexão ou tempo esgotado).');
+        }
+
+        if ($response->status() === 429) {
+            throw new ExternalLookupException('Open Library: limite de requisições atingido (HTTP 429).');
+        }
+        if ($response->failed() || ! is_array($response->json())) {
+            throw new ExternalLookupException('Open Library não retornou uma resposta válida.');
+        }
+
+        $covers = rtrim($config['covers_url'] ?? 'https://covers.openlibrary.org', '/');
+
+        return collect($response->json('docs', []))->filter(fn ($doc) => is_array($doc))->map(function (array $doc) use ($covers) {
+            $isbns = $this->textList($doc['isbn'] ?? null, 40);
+            $isbn13 = collect($isbns)->first(fn ($value) => $this->isbn->isValidIsbn13($this->isbn->normalize($value)));
+            $isbn10 = collect($isbns)->first(fn ($value) => $this->isbn->isValidIsbn10($this->isbn->normalize($value)));
+            $key = $this->text($doc['key'] ?? null, 100);
+            $coverId = is_int($doc['cover_i'] ?? null) ? $doc['cover_i'] : null;
+
+            return [
+                'provider' => $this->name(), 'external_id' => $key ? basename($key) : null,
+                'source_url' => $key ? 'https://openlibrary.org'.$key : null,
+                'title' => $this->text($doc['title'] ?? null, 255), 'subtitle' => $this->text($doc['subtitle'] ?? null, 255),
+                'authors' => $this->textList($doc['author_name'] ?? null),
+                'publisher' => $this->textList($doc['publisher'] ?? null)[0] ?? null,
+                'publication_year' => $this->positiveInt($doc['first_publish_year'] ?? null),
+                'isbn10' => $isbn10 ? $this->isbn->normalize($isbn10) : null,
+                'isbn13' => $isbn13 ? $this->isbn->normalize($isbn13) : null,
+                'edition' => null, 'pages' => null, 'description' => null, 'categories' => [],
+                'cover_url' => $coverId ? "{$covers}/b/id/{$coverId}-L.jpg" : null,
+                'language' => $this->textList($doc['language'] ?? null, 10)[0] ?? null, 'raw' => $doc,
+            ];
+        })->filter(fn (array $item) => filled($item['title']))->values()->all();
+    }
 
     /**
      * @return array<string, mixed>|null null quando o ISBN não é encontrado
@@ -29,7 +86,7 @@ class OpenLibraryService
         $timeout = $config['timeout'] ?? 8;
 
         try {
-            $response = Http::timeout($timeout)->acceptJson()->get("{$base}/isbn/{$isbn13}.json");
+            $response = $this->client($timeout)->get("{$base}/isbn/{$isbn13}.json");
 
             if ($response->status() === 404) {
                 return null;
@@ -74,7 +131,7 @@ class OpenLibraryService
             }
 
             try {
-                $author = Http::timeout($timeout)->acceptJson()->get("{$base}{$key}.json");
+                $author = $this->client($timeout)->get("{$base}{$key}.json");
                 $name = $author->successful() ? $this->text($author->json('name'), 255) : null;
                 if ($name !== null) {
                     $names[] = $name;
@@ -135,5 +192,16 @@ class OpenLibraryService
             'language' => $language,
             'raw' => $edition,
         ];
+    }
+
+    private function client(int $timeout): PendingRequest
+    {
+        $config = config('services.open_library');
+        $agent = trim((string) ($config['user_agent'] ?? 'BibliotecaEscolar/1.0'));
+        $contact = trim((string) ($config['contact'] ?? ''));
+
+        return Http::timeout($timeout)->acceptJson()->withHeaders([
+            'User-Agent' => $contact === '' ? $agent : "{$agent} ({$contact})",
+        ]);
     }
 }

@@ -85,10 +85,10 @@ class LoanController extends Controller
             $message .= " Devolvido com {$result['days_overdue']} dia(s) de atraso.";
         }
         if ($result['held_for']) {
-            $message .= " ATEN√á√ÉO: reservado para {$result['held_for']->name} ‚Äî separe o exemplar.";
+            $message .= " ATEN«√O: reservado para {$result['held_for']->name} ó separe o exemplar.";
         }
 
-        $feedback = Feedback::success('Devolu√ß√£o registrada', trim(str_replace('ATEN√á√ÉO: ', '', $message)), [], '#return_code');
+        $feedback = Feedback::success('DevoluÁ„o registrada', trim(str_replace('ATEN«√O: ', '', $message)), [], '#return_code');
         if ($result['held_for']) {
             $feedback['tone'] = 'warning';
             $feedback['title'] = 'Devolu√ß√£o registrada: separe o exemplar';

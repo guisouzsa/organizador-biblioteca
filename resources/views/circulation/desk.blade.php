@@ -99,7 +99,7 @@
             @endif
         </section>
 
-        {{-- DEVOLU√á√ÉO --}}
+        {{-- DEVOLU«√O --}}
         <section class="panel min-w-0 p-4 sm:p-5" aria-labelledby="devolver">
             <h2 id="devolver" class="flex items-center gap-2 text-lg"><span class="grid h-7 w-7 place-items-center rounded-md bg-emerald-600 text-sm text-white">2</span> Devolver</h2>
             @can('loan.return')

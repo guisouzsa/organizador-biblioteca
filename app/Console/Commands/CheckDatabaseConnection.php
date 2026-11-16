@@ -99,7 +99,7 @@ class CheckDatabaseConnection extends Command
     {
         $this->line("  <fg=red>[FALHA]</> {$message}");
         $this->newLine();
-        $this->error('Resultado: NÃƒO VALIDADO.');
+        $this->error('Resultado: NÃO VALIDADO.');
 
         return self::FAILURE;
     }

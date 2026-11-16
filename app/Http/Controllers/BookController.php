@@ -67,7 +67,11 @@ class BookController extends Controller
     {
         $this->authorize('create', Book::class);
 
-        return view('catalog.create', $this->formData(['isbn' => $request->query('isbn')]));
+        $token = $request->query('lookup_token');
+        $values = $this->lookup->formValuesForToken(is_string($token) ? $token : null);
+        $values['isbn'] = $values['isbn'] ?? $request->query('isbn');
+
+        return view('catalog.create', $this->formData($values));
     }
 
     public function store(StoreBookRequest $request): RedirectResponse

@@ -152,7 +152,7 @@ Ator: quem reservou (portal futuro), AUX/BIB/ADM. `waiting|ready → cancelled` 
 Ao tentar emprestar uma cópia **retida** (`ready`) para outro leitor → `[EXEMPLAR_RETIDO_OUTRO]`. Ao tentar **renovar** livro com fila → negado (RN-CIR-07). Ao consultar o catálogo → "N reservas". Exceção administrativa: BIB pode **forçar** o empréstimo com motivo (auditado) — *a confirmar* (decisão §10). **Testes:** retida/renovação/forçado.
 
 ### UC-CIR-014 — Devolução de livro com reserva pendente
-Dentro da transação da devolução: 1. Seleciona a 1ª `waiting` por `requested_at`. 2. `status=ready`, `copy_id`, `ready_at`, `expires_at` (= agora + `reservation_hold_hours`, se definido). 3. A cópia deixa de estar disponível (RN-ACE-07). 4. Mostra ao operador: "Reservado para JOÃO (turma 2º A). Separar na estante de reservas." Job `ExpireReservations` (agendado): `ready` vencida → `expired`, repete a seleção para o próximo; sem fila → cópia volta a disponível.
+Dentro da transa��o da devolu��o: 1. Seleciona a 1� `waiting` por `requested_at`. 2. `status=ready`, `copy_id`, `ready_at`, `expires_at` (= agora + `reservation_hold_hours`, se definido). 3. A c�pia deixa de estar dispon�vel (RN-ACE-07). 4. Mostra ao operador: "Reservado para JO�O (turma 2� A). Separar na estante de reservas." Job `ExpireReservations` (agendado): `ready` vencida ? `expired`, repete a sele��o para o pr�ximo; sem fila ? c�pia volta a dispon�vel.
 Exceções: falha do job → próxima execução reprocessa (idempotente). **Testes:** promoção; expiração; ordem; sem fila.
 
 ### UC-CIR-015 — Falha durante a gravação de um empréstimo

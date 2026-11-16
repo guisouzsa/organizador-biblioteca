@@ -128,6 +128,22 @@ class BookLookupService
         return Cache::get($this->cacheKey($token), []);
     }
 
+    /** @return array<string, mixed> */
+    public function formValuesForToken(?string $token): array
+    {
+        $sources = $this->sourcesForToken($token);
+        if ($sources === []) {
+            return [];
+        }
+
+        $merged = $this->comparison->merge($sources);
+        $merged['authors'] = implode('; ', $merged['authors'] ?? []);
+        $merged['isbn'] = $merged['isbn13'] ?? $merged['isbn10'] ?? null;
+        $merged['lookup_token'] = $token;
+
+        return $merged;
+    }
+
     /**
      * Consulta cada provedor isoladamente: a falha de um não impede o outro.
      *

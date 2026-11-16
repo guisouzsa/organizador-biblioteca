@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\BibliographicSearchController;
+use App\Http\Controllers\BookImageIdentificationController;
 use App\Http\Controllers\BorrowerController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CirculationController;
@@ -47,6 +49,8 @@ Route::middleware(['auth', 'active', 'password.changed'])->group(function () {
     Route::prefix('catalogo')->name('books.')->group(function () {
         Route::get('/', [BookController::class, 'index'])->name('index');
         Route::get('novo', [BookController::class, 'create'])->name('create');
+        Route::get('pesquisar', BibliographicSearchController::class)->middleware('throttle:20,1')->name('search');
+        Route::post('identificar-imagem', BookImageIdentificationController::class)->middleware('throttle:10,1')->name('identify-image');
         Route::get('scanner', [ScannerController::class, 'index'])->name('scanner');
         // Limite por IP: protege a cota das APIs externas.
         Route::post('isbn', IsbnLookupController::class)->middleware('throttle:30,1')->name('lookup');

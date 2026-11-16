@@ -15,7 +15,7 @@ use Illuminate\Validation\Rules\Password as PasswordRule;
  *
  * - Interativo: pergunta a senha (entrada oculta).
  * - --generate: gera uma senha aleat√≥ria, grava em um arquivo local fora do Git
- *   (storage/app/private) e exige a troca no primeiro acesso. A senha N√ÉO √© impressa.
+ *   (storage/app/private) e exige a troca no primeiro acesso. A senha N√O È impressa.
  */
 class CreateAdminUser extends Command
 {
