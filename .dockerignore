@@ -1,0 +1,12 @@
+.git
+.github
+node_modules
+vendor
+tests
+.env
+.env.*
+storage/*.key
+storage/pail
+public/storage
+public/hot
+Claude outputs

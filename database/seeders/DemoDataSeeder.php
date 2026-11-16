@@ -68,7 +68,9 @@ class DemoDataSeeder extends Seeder
                 $candidate = collect($provider->search($query.' language:por', 8))
                     ->filter(fn ($item) => filled($item['isbn13'] ?? null))
                     ->map(fn ($item) => $provider->findByIsbn($item['isbn13']))
-                    ->first(fn ($item) => is_array($item) && filled($item['title'] ?? null));
+                    ->first(fn ($item) => is_array($item)
+                        && filled($item['title'] ?? null)
+                        && in_array(strtolower((string) ($item['language'] ?? '')), ['por', 'pt', 'pt-br'], true));
             } catch (\Throwable $e) {
                 $this->command?->warn("Fonte indisponível para: {$query}");
                 continue;
