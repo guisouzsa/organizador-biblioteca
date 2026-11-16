@@ -1,12 +1,12 @@
 @if (session('status'))
-    <div role="status" class="mb-6 flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+    <div role="status" data-autohide class="mb-6 flex items-start gap-3 rounded-md border-l-4 border-emerald-600 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
         <x-shared.icon name="check" class="mt-0.5 h-4 w-4 shrink-0" />
         <span>{{ session('status') }}</span>
     </div>
 @endif
 
 @if (session('error'))
-    <div role="alert" class="mb-6 flex items-start gap-3 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+    <div role="alert" class="mb-6 flex items-start gap-3 rounded-md border-l-4 border-rose-600 bg-rose-50 px-4 py-3 text-sm text-rose-900">
         <x-shared.icon name="alert" class="mt-0.5 h-4 w-4 shrink-0" />
         <div>
             <p>{{ session('error') }}</p>
