@@ -31,6 +31,10 @@ function initScanner(root) {
 
     let controls = null;
     let starting = false;
+    // Cada início de câmera recebe um número; parar a câmera o invalida. Leituras atrasadas
+    // (ex.: quadro já em decodificação, ou código detectado antes de `controls` existir)
+    // de uma sessão encerrada são descartadas, evitando consultas duplicadas.
+    let session = 0;
     let handling = false; // evita leituras duplicadas enquanto o mesmo código está na frente da câmera
     let lastRejected = { code: null, at: 0 };
 
@@ -44,6 +48,7 @@ function initScanner(root) {
     }
 
     function stopCamera() {
+        session += 1;
         if (controls) {
             try {
                 controls.stop();
@@ -118,14 +123,29 @@ function initScanner(root) {
             audio: false,
         };
 
+        const mySession = ++session;
+
         try {
-            controls = await reader.decodeFromConstraints(constraints, els.video, (result, error) => {
+            const started = await reader.decodeFromConstraints(constraints, els.video, (result, error) => {
+                if (mySession !== session) {
+                    return; // sessão já encerrada: ignora
+                }
                 if (result) {
                     onCode(result.getText());
                 } else if (error && !(error instanceof NotFoundException)) {
                     // Erros de decodificação transitórios são esperados; ignorados.
                 }
             });
+
+            if (mySession !== session) {
+                // Foi parada (ou detectou um código) enquanto iniciava: encerra o que acabou de abrir.
+                started.stop();
+                const stream = els.video.srcObject;
+                stream?.getTracks?.().forEach((track) => track.stop());
+                els.video.srcObject = null;
+                return;
+            }
+            controls = started;
 
             els.placeholder.classList.add('hidden');
             els.frame.classList.remove('hidden');
