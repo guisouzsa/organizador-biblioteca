@@ -11,7 +11,16 @@
     @stack('head')
 </head>
 <body class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased">
-    @yield('content')
+    <a href="#conteudo" class="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2">Ir para o conteúdo</a>
+
+    <x-layout.header />
+
+    <main id="conteudo" class="py-8">
+        <x-layout.container>
+            <x-shared.flash />
+            @yield('content')
+        </x-layout.container>
+    </main>
 
     @stack('scripts')
 </body>
