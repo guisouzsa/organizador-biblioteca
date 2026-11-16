@@ -2,18 +2,14 @@
 
 namespace App\Http\Requests;
 
-use App\Services\IsbnValidatorService;
+use App\DTOs\Catalog\BookData;
+use App\Services\Catalog\IsbnValidatorService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 /** Regras comuns de cadastro e edição de livros. */
 abstract class BookRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return true; // Autenticação/permissões serão tratadas em etapa própria.
-    }
-
     protected function prepareForValidation(): void
     {
         $parsed = app(IsbnValidatorService::class)->parse($this->input('isbn'));
@@ -51,7 +47,7 @@ abstract class BookRequest extends FormRequest
             'categories' => ['nullable', 'array'],
             'categories.*' => ['integer', Rule::exists('categories', 'id')],
             'new_categories' => ['nullable', 'string', 'max:500'],
-            'collection_name' => ['nullable', 'string', 'max:255'],
+            'collection_id' => ['nullable', 'integer', Rule::exists('collections', 'id')],
             'lookup_token' => ['nullable', 'string', 'max:64'],
         ];
     }
@@ -59,19 +55,20 @@ abstract class BookRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'title' => 'título',
-            'subtitle' => 'subtítulo',
-            'authors' => 'autores',
-            'publisher' => 'editora',
-            'isbn' => 'ISBN',
-            'edition' => 'edição',
-            'publication_year' => 'ano de publicação',
-            'pages' => 'páginas',
-            'description' => 'descrição',
-            'cover_url' => 'URL da capa',
-            'language' => 'idioma',
-            'format' => 'formato',
+            'title' => 'título', 'subtitle' => 'subtítulo', 'authors' => 'autores', 'publisher' => 'editora',
+            'isbn' => 'ISBN', 'edition' => 'edição', 'publication_year' => 'ano de publicação',
+            'pages' => 'páginas', 'description' => 'descrição', 'cover_url' => 'URL da capa',
+            'language' => 'idioma', 'format' => 'formato', 'collection_id' => 'coleção',
         ];
+    }
+
+    public function toDto(): BookData
+    {
+        return BookData::fromArray([
+            ...$this->validated(),
+            'isbn10' => $this->input('isbn10'),
+            'isbn13' => $this->input('isbn13'),
+        ]);
     }
 
     /** "A; B" ou uma linha por autor → "A; B". */

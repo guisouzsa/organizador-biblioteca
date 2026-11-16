@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Exceptions\ExternalLookupException;
-use App\Services\GoogleBooksService;
+use App\Services\Catalog\GoogleBooksService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;

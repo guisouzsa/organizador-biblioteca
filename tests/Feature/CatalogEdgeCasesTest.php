@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Book;
+use App\Models\BookCollection;
 use App\Models\Category;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -11,6 +12,12 @@ use Tests\TestCase;
 class CatalogEdgeCasesTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->signIn();
+    }
 
     public function test_book_with_only_a_title_renders_in_list_and_details(): void
     {
@@ -36,7 +43,7 @@ class CatalogEdgeCasesTest extends TestCase
             'title' => 'Sociologia em Movimento', 'subtitle' => 'Ensino Médio', 'authors' => 'Ana Lima; Bruno Souza',
             'publisher' => 'Moderna', 'isbn' => '978-0-306-40615-7', 'edition' => '3ª', 'publication_year' => 2023,
             'pages' => 416, 'description' => 'Descrição longa.', 'cover_url' => 'https://exemplo.com/c.jpg',
-            'language' => 'pt-BR', 'format' => 'Brochura', 'categories' => [$category->id], 'collection_name' => 'Coleção Z',
+            'language' => 'pt-BR', 'format' => 'Brochura', 'categories' => [$category->id], 'collection_id' => BookCollection::create(['name' => 'Coleção Z'])->id,
         ])->assertRedirect();
 
         $book = Book::with(['categories', 'collection'])->where('isbn13', '9780306406157')->firstOrFail();

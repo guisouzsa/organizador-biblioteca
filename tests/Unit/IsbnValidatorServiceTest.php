@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use App\Services\IsbnValidatorService;
+use App\Services\Catalog\IsbnValidatorService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

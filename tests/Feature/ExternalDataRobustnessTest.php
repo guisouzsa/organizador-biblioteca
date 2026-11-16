@@ -4,8 +4,8 @@ namespace Tests\Feature;
 
 use App\Exceptions\ExternalLookupException;
 use App\Models\Book;
-use App\Services\GoogleBooksService;
-use App\Services\OpenLibraryService;
+use App\Services\Catalog\GoogleBooksService;
+use App\Services\Catalog\OpenLibraryService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
@@ -15,6 +15,12 @@ use Tests\TestCase;
 class ExternalDataRobustnessTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->signIn();
+    }
 
     private const ISBN = '9780306406157';
 

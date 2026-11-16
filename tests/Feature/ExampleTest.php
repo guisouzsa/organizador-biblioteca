@@ -6,8 +6,16 @@ use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
-    public function test_home_redirects_to_catalog(): void
+    public function test_guest_is_redirected_to_login(): void
     {
-        $this->get('/')->assertRedirect('/catalogo');
+        $this->get('/')->assertRedirect('/login');
+        $this->get('/catalogo')->assertRedirect('/login');
+    }
+
+    public function test_authenticated_home_goes_to_dashboard(): void
+    {
+        $this->signIn();
+
+        $this->get('/')->assertRedirect('/painel');
     }
 }

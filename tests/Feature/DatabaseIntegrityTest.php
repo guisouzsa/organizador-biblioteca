@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Models\Book;
 use App\Models\BookCollection;
 use App\Models\Category;
-use App\Services\BookCatalogService;
+use App\Services\Catalog\BookCatalogService;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -17,6 +17,12 @@ use Tests\TestCase;
 class DatabaseIntegrityTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->signIn();
+    }
 
     private const ISBN13 = '9780306406157';
 

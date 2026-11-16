@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Catalog;
 
 use App\Exceptions\ExternalLookupException;
 use App\Models\BookSource;
-use App\Services\Concerns\SanitizesExternalData;
+use App\Services\Catalog\Concerns\SanitizesExternalData;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 

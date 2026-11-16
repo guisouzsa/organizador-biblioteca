@@ -6,7 +6,7 @@ use App\Models\Book;
 use App\Models\BookCollection;
 use App\Models\BookSource;
 use App\Models\Category;
-use App\Services\BookLookupService;
+use App\Services\Catalog\BookLookupService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
@@ -15,6 +15,12 @@ use Tests\TestCase;
 class CatalogTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->signIn();
+    }
 
     private const ISBN13 = '9780306406157';
 
@@ -124,17 +130,17 @@ class CatalogTest extends TestCase
     public function test_registration_attaches_existing_and_new_categories_and_collection(): void
     {
         $existing = Category::findOrCreateByName('Matemática');
+        $collection = BookCollection::create(['name' => 'PNLD 2026 — Ciências Humanas']);
 
         $this->post('/catalogo', $this->payload([
             'categories' => [$existing->id],
             'new_categories' => 'Projeto de Vida, matemática',
-            'collection_name' => 'PNLD 2026 — Ciências Humanas',
+            'collection_id' => $collection->id,
         ]))->assertRedirect();
 
         $book = Book::firstOrFail();
         $this->assertEqualsCanonicalizing(['Matemática', 'Projeto de Vida'], $book->categories->pluck('name')->all());
         $this->assertSame('PNLD 2026 — Ciências Humanas', $book->collection->name);
-        $this->assertSame('unverified', $book->collection->verification_status);
     }
 
     public function test_registration_with_lookup_token_records_sources(): void

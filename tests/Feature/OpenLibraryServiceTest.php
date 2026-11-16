@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Exceptions\ExternalLookupException;
-use App\Services\OpenLibraryService;
+use App\Services\Catalog\OpenLibraryService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;

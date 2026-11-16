@@ -8,7 +8,7 @@ class LookupIsbnRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return $this->user()?->can('catalog.create') ?? false;
     }
 
     public function rules(): array

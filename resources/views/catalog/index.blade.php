@@ -8,18 +8,14 @@
 @endphp
 
 @section('content')
-    <div class="flex flex-wrap items-end justify-between gap-3">
-        <div>
-            <h1 class="text-2xl font-semibold tracking-tight">Catálogo</h1>
-            <p class="mt-1 text-sm text-slate-600">{{ $books->total() }} {{ $books->total() === 1 ? 'livro' : 'livros' }}{{ $hasFilters ? ' encontrados' : ' cadastrados' }}</p>
-        </div>
-        <div class="flex gap-2">
+    <x-shared.page-header title="Catálogo" :subtitle="$books->total().' '.($books->total() === 1 ? 'livro' : 'livros').($hasFilters ? ' encontrados' : ' cadastrados')">
+        @can('catalog.create')
             <a href="{{ route('books.scanner') }}" class="rounded-md bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Escanear livro</a>
             <a href="{{ route('books.create') }}" class="rounded-md px-4 py-2.5 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100">Cadastro manual</a>
-        </div>
-    </div>
+        @endcan
+    </x-shared.page-header>
 
-    <form method="GET" action="{{ route('books.index') }}" class="mt-6 grid gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:grid-cols-2 lg:grid-cols-6">
+    <form method="GET" action="{{ route('books.index') }}" class="grid gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:grid-cols-2 lg:grid-cols-6">
         <div class="sm:col-span-2">
             <label for="q" class="block text-sm font-medium text-slate-700">Buscar</label>
             <input id="q" name="q" type="search" value="{{ $filters['q'] ?? '' }}" placeholder="Título, autor ou ISBN" class="{{ $select }}">
@@ -60,8 +56,11 @@
                 @endforeach
             </select>
         </div>
-        <div class="flex items-end gap-2 sm:col-span-2 lg:col-span-6">
+        <div class="flex flex-wrap items-center gap-3 sm:col-span-2 lg:col-span-6">
             <button type="submit" class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">Filtrar</button>
+            <label class="flex items-center gap-2 text-sm text-slate-600">
+                <input type="checkbox" name="archived" value="1" @checked($filters['archived'] ?? false) class="rounded border-slate-300 text-indigo-600"> Incluir livros arquivados
+            </label>
             @if ($hasFilters)
                 <a href="{{ route('books.index') }}" class="rounded-md px-4 py-2 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100">Limpar filtros</a>
             @endif
@@ -69,17 +68,17 @@
     </form>
 
     @if ($books->isEmpty())
-        <div class="mt-8 rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center">
+        <div class="mt-8">
             @if ($hasFilters)
-                <p class="font-medium">Nenhum livro corresponde aos filtros.</p>
-                <p class="mt-1 text-sm text-slate-600">Tente outros termos ou limpe os filtros.</p>
+                <x-shared.empty-state title="Nenhum livro corresponde aos filtros." text="Tente outros termos ou limpe os filtros." icon="book" />
             @else
-                <p class="font-medium">O catálogo ainda não tem livros.</p>
-                <p class="mt-1 text-sm text-slate-600">Escaneie o código de barras de um livro ou cadastre-o manualmente.</p>
+                <x-shared.empty-state title="O catálogo ainda não tem livros." text="Escaneie o código de barras de um livro ou cadastre-o manualmente." icon="book">
+                    @can('catalog.create')<a href="{{ route('books.scanner') }}" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">Escanear livro</a>@endcan
+                </x-shared.empty-state>
             @endif
         </div>
     @else
-        <ul class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             @foreach ($books as $book)
                 <li class="relative flex gap-4 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 transition hover:ring-indigo-300">
                     <x-shared.book-cover :book="$book" class="h-36 w-24 shrink-0" />
@@ -96,13 +95,19 @@
                         @if ($book->isbn13 ?? $book->isbn10)
                             <p class="mt-1 font-mono text-xs text-slate-500">ISBN {{ $book->isbn13 ?? $book->isbn10 }}</p>
                         @endif
-                        @if ($book->categories->isNotEmpty())
-                            <p class="mt-2 flex flex-wrap gap-1">
-                                @foreach ($book->categories as $category)
-                                    <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">{{ $category->name }}</span>
-                                @endforeach
-                            </p>
-                        @endif
+                        <p class="mt-2 flex flex-wrap gap-1">
+                            @if ($book->isArchived())<x-shared.badge tone="slate">Arquivado</x-shared.badge>@endif
+                            @if ($book->copies_count === 0)
+                                <x-shared.badge tone="slate">Sem exemplares</x-shared.badge>
+                            @elseif ($book->available_copies_count > 0)
+                                <x-shared.badge tone="emerald">{{ $book->available_copies_count }} de {{ $book->copies_count }} disponível(is)</x-shared.badge>
+                            @else
+                                <x-shared.badge tone="amber">Nenhum disponível ({{ $book->copies_count }})</x-shared.badge>
+                            @endif
+                            @foreach ($book->categories->take(3) as $category)
+                                <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">{{ $category->name }}</span>
+                            @endforeach
+                        </p>
                     </div>
                 </li>
             @endforeach

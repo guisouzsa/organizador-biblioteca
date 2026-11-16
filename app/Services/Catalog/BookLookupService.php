@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Catalog;
 
 use App\Exceptions\ExternalLookupException;
 use App\Models\Book;
 use App\Models\BookSource;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
@@ -61,10 +62,8 @@ class BookLookupService
             return $result;
         }
 
-        $existing = Book::query()
-            ->where('isbn13', $parsed['isbn13'])
-            ->when($parsed['isbn10'], fn ($q, $isbn10) => $q->orWhere('isbn10', $isbn10))
-            ->first();
+        // Mesma regra de duplicidade usada no cadastro (Book::withIsbn).
+        $existing = Book::query()->withIsbn($parsed['isbn13'], $parsed['isbn10'])->first();
 
         if ($existing) {
             return [...$result, 'status' => self::STATUS_EXISTS, 'message' => null, 'book' => $existing];
@@ -102,6 +101,21 @@ class BookLookupService
             'errors' => $errors,
             'token' => $token,
         ];
+    }
+
+    /**
+     * Valores iniciais do formulário de confirmação (a apresentação fica fora do controller).
+     *
+     * @param  array<string, mixed>  $result  retorno de lookup()
+     * @return array<string, mixed>
+     */
+    public function formValues(array $result): array
+    {
+        $values = Arr::except($result['merged'], ['categories']) + ['isbn' => $result['isbn13']];
+        $values['authors'] = implode('; ', $result['merged']['authors'] ?? []);
+        $values['lookup_token'] = $result['token'];
+
+        return $values;
     }
 
     /** Fontes guardadas de uma consulta anterior (para gravar a procedência ao salvar). */

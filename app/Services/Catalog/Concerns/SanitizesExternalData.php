@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Concerns;
+namespace App\Services\Catalog\Concerns;
 
 /**
  * Normalização defensiva de dados vindos de APIs externas: qualquer campo com

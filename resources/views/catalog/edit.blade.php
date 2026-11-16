@@ -4,10 +4,9 @@
 
 @section('content')
     <div class="max-w-3xl">
-        <h1 class="text-2xl font-semibold tracking-tight">Editar registro</h1>
-        <p class="mt-1 text-sm text-slate-600">{{ $book->title }}</p>
+        <x-shared.page-header title="Editar registro" :subtitle="$book->title" />
 
-        <div class="mt-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <div class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
             @include('catalog.partials.form', [
                 'action' => route('books.update', $book),
                 'method' => 'PUT',
@@ -15,5 +14,6 @@
                 'suggestedCategories' => [],
             ])
         </div>
+        <p class="mt-3 text-xs text-slate-500">As alterações ficam registradas na auditoria (quem mudou, o quê e quando).</p>
     </div>
 @endsection

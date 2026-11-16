@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Catalog;
 
 /**
  * Validação, normalização e conversão de ISBN-10 / ISBN-13.

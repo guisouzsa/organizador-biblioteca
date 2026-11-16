@@ -3,8 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Book;
-use App\Services\BookLookupService;
-use App\Services\MetadataComparisonService;
+use App\Services\Catalog\BookLookupService;
+use App\Services\Catalog\MetadataComparisonService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
