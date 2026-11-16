@@ -91,6 +91,14 @@ class CatalogEdgeCasesTest extends TestCase
         $this->assertSame(0, $book->fresh()->categories()->count());
     }
 
+    public function test_validation_messages_and_pagination_are_in_portuguese(): void
+    {
+        $this->post('/catalogo', ['title' => ''])->assertSessionHasErrors(['title' => 'O campo título é obrigatório.']);
+
+        Book::factory()->count(13)->create();
+        $this->get('/catalogo')->assertSee('Próxima', false)->assertDontSee('Next', false);
+    }
+
     public function test_invalid_filter_values_are_rejected_not_executed(): void
     {
         $this->get('/catalogo?year=abc')->assertSessionHasErrors('year');
