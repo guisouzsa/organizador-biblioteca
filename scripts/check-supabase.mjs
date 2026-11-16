@@ -107,25 +107,45 @@ if (health.status === 200) {
   fail(`Resposta inesperada do Auth: HTTP ${health.status}.`);
 }
 
-const rest = await probe("Data API", "/rest/v1/");
+// Auth settings exige chave válida: comprova credenciais (200 = aceita, 401 = rejeitada).
+const settings = await probe("Auth settings", "/auth/v1/settings");
+if (settings.networkError) {
+  fail(`Erro de rede ao validar credenciais (${settings.networkError}).`);
+} else {
+  console.log(`  GET /auth/v1/settings -> HTTP ${settings.status}`);
+  if (settings.status === 200) {
+    ok("Chave publicável aceita pelo projeto (credenciais válidas).");
+  } else if (settings.status === 401 || settings.status === 403) {
+    fail("Chave publicável rejeitada pelo projeto (credencial inválida).");
+  } else {
+    fail(`Resposta inesperada ao validar credenciais: HTTP ${settings.status}.`);
+  }
+}
+
+// Data API: a raiz só aceita secret key; uma tabela inexistente prova que a
+// requisição atravessa o gateway e chega ao PostgREST (404 PGRST205 != falha de conexão).
+async function bodyOf(r) {
+  try {
+    return await r.res.json();
+  } catch {
+    return {};
+  }
+}
+
+const rest = await probe("Data API", "/rest/v1/__verificacao_inexistente__?select=*");
 if (rest.networkError) {
   fail(`Erro de rede na Data API (${rest.networkError}).`);
 } else {
-  console.log(`  GET /rest/v1/       -> HTTP ${rest.status}`);
-  if (rest.status === 200) {
-    ok("Data API (PostgREST) respondeu e aceitou a chave publicável.");
-  } else if (rest.status === 401) {
-    fail("Data API rejeitou a chave (HTTP 401): credencial inválida.");
-  } else if (rest.status === 403) {
-    // A raiz da Data API é restrita a roles privilegiadas com chaves novas;
-    // 403 aqui comprova que o projeto respondeu e a chave foi reconhecida,
-    // mas sem permissão para listar o schema (comportamento esperado).
-    warn(
-      "Data API respondeu HTTP 403: projeto alcançável; o schema raiz exige permissão " +
-        "maior (esperado com chave publicável). Permissões a nível de tabela dependem de RLS.",
-    );
-  } else if (rest.status === 404) {
-    warn("Data API retornou 404 (recurso inexistente) — diferente de falha de conexão.");
+  const body = await bodyOf(rest);
+  console.log(`  GET /rest/v1/<tabela inexistente> -> HTTP ${rest.status}${body.code ? ` (${body.code})` : ""}`);
+  if (rest.status === 404 && body.code === "PGRST205") {
+    ok("Data API (PostgREST) respondeu: tabela inexistente é esperado, não é falha de conexão.");
+  } else if (rest.status === 200) {
+    ok("Data API respondeu HTTP 200.");
+  } else if (rest.status === 401 && /invalid api key/i.test(body.message ?? "")) {
+    fail("Data API rejeitou a chave (Invalid API key).");
+  } else if (rest.status === 401 || rest.status === 403) {
+    warn(`Data API negou acesso (HTTP ${rest.status}): permissão/RLS, não falha de conexão.`);
   } else {
     fail(`Resposta inesperada da Data API: HTTP ${rest.status}.`);
   }
