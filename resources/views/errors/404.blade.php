@@ -1,0 +1,1 @@
+@include('errors.minimal', ['title' => 'Página não encontrada', 'message' => 'O endereço não existe ou o registro foi removido. Confira o link ou volte ao início.', 'icon' => 'info', 'tone' => 'info'])

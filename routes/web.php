@@ -21,6 +21,9 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ScannerController;
 use Illuminate\Support\Facades\Route;
 
+// ---------- Página pública de apresentação ----------
+Route::view('/', 'landing')->name('home');
+
 // ---------- Acesso (público) ----------
 Route::middleware('guest')->group(function () {
     Route::get('login', [LoginController::class, 'create'])->name('login');
@@ -35,8 +38,6 @@ Route::post('logout', [LoginController::class, 'destroy'])->middleware('auth')->
 
 // ---------- Área autenticada ----------
 Route::middleware(['auth', 'active', 'password.changed'])->group(function () {
-    Route::redirect('/', '/painel')->name('home');
-
     Route::get('minha-conta/senha', [PasswordController::class, 'changeForm'])->name('account.password');
     Route::put('minha-conta/senha', [PasswordController::class, 'change'])->name('account.password.update');
 

@@ -31,7 +31,7 @@
                         <td class="px-4 py-3">{{ $u->last_login_at?->format('d/m/Y H:i') ?? 'nunca' }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-right">
                             <a href="{{ route('users.edit', $u) }}" class="btn btn-secondary">Editar</a>
-                            <form method="POST" action="{{ route('users.reset-password', $u) }}" class="inline" data-once onsubmit="return confirm('Gerar uma nova senha temporária para {{ $u->name }}?')">@csrf
+                            <form method="POST" action="{{ route('users.reset-password', $u) }}" class="inline" data-once data-confirm="Será gerada uma senha temporária para {{ $u->name }}. A senha atual deixa de valer e a pessoa precisará trocá-la no próximo acesso." data-confirm-title="Redefinir a senha?" data-confirm-label="Gerar nova senha">@csrf
                                 <button class="btn btn-secondary">Redefinir senha</button></form>
                         </td>
                     </tr>

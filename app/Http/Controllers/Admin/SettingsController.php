@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Support\Feedback;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SettingsRequest;
 use App\Services\Admin\AuditLogger;
@@ -40,6 +41,7 @@ class SettingsController extends Controller
             $audit->record('settings.updated', null, $changedOld, $changedNew);
         }
 
-        return redirect()->route('settings.edit')->with('status', 'Configurações salvas. O novo prefixo vale apenas para códigos gerados daqui em diante.');
+        return redirect()->route('settings.edit')->with('status', 'Configurações salvas. O novo prefixo vale apenas para códigos gerados daqui em diante.')
+            ->with('feedback', Feedback::success('Configurações salvas', 'As alterações foram aplicadas. Um novo prefixo de código vale apenas para exemplares registrados daqui em diante.'));
     }
 }

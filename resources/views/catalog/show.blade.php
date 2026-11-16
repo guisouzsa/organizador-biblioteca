@@ -14,6 +14,10 @@
         'ISBN-10' => $book->isbn10,
         'Idioma' => $book->language,
         'Formato' => $book->format,
+        'Grupo do acervo' => $book->collectionGroupLabel(),
+        'Tipo de material' => $book->materialTypeLabel(),
+        'Público / faixa etária' => $book->audience,
+        'Etapa de ensino' => $book->education_stage,
         'Coleção' => $book->collection?->name,
     ];
 @endphp
@@ -24,7 +28,7 @@
     </nav>
 
     <article class="grid gap-6 md:grid-cols-[11rem_1fr] md:gap-10">
-        <div class="mx-auto w-36 md:sticky md:top-8 md:w-full md:self-start">
+        <div class="marca-pagina mx-auto w-36 md:sticky md:top-8 md:w-full md:self-start">
             <x-shared.book-cover :book="$book" class="w-full" />
         </div>
 
@@ -33,18 +37,22 @@
                 <div>
                     <p class="eyebrow mb-1">Ficha bibliográfica</p>
                     <h1 class="text-3xl leading-tight">{{ $book->title }}</h1>
+                    <p class="mt-2 flex flex-wrap gap-1.5">
+                        <x-shared.badge :tone="$book->collection_group === 'school' ? 'sky' : 'indigo'">{{ $book->collectionGroupLabel() }}</x-shared.badge>
+                        @if ($book->materialTypeLabel())<x-shared.badge>{{ $book->materialTypeLabel() }}</x-shared.badge>@endif
+                    </p>
                     @if ($book->isArchived())<x-shared.badge tone="slate" class="mt-1">Arquivado em {{ $book->archived_at->format('d/m/Y') }}</x-shared.badge>@endif
                 </div>
                 <div class="flex flex-wrap gap-2">
                     @can('update', $book)<a href="{{ route('books.edit', $book) }}" class="btn btn-secondary">Editar</a>@endcan
                     @can('archive', $book)
-                        <form method="POST" action="{{ route($book->isArchived() ? 'books.restore' : 'books.archive', $book) }}" onsubmit="return confirm('{{ $book->isArchived() ? 'Restaurar este livro ao catálogo?' : 'Arquivar este livro? Ele sai da busca padrão; os exemplares continuam no acervo.' }}')">
+                        <form method="POST" action="{{ route($book->isArchived() ? 'books.restore' : 'books.archive', $book) }}" data-confirm="{{ $book->isArchived() ? '“'.$book->title.'” voltará a aparecer no catálogo.' : '“'.$book->title.'” deixa de aparecer na busca padrão. Os exemplares continuam no acervo.' }}" data-confirm-title="{{ $book->isArchived() ? 'Restaurar este livro?' : 'Arquivar este livro?' }}" data-confirm-label="{{ $book->isArchived() ? 'Restaurar' : 'Arquivar' }}">
                             @csrf
                             <button class="btn btn-secondary">{{ $book->isArchived() ? 'Restaurar' : 'Arquivar' }}</button>
                         </form>
                     @endcan
                     @can('delete', $book)
-                        <form method="POST" action="{{ route('books.destroy', $book) }}" onsubmit="return confirm('Excluir definitivamente este livro? Esta ação não pode ser desfeita.')">
+                        <form method="POST" action="{{ route('books.destroy', $book) }}" data-confirm="“{{ $book->title }}” será excluído do catálogo. Esta ação não pode ser desfeita." data-confirm-title="Excluir este livro?" data-confirm-label="Excluir livro" data-confirm-danger">
                             @csrf @method('DELETE')
                             <button class="btn btn-danger">Excluir</button>
                         </form>
@@ -66,7 +74,7 @@
             @if ($book->categories->isNotEmpty())
                 <p class="mt-4 flex flex-wrap gap-1">
                     @foreach ($book->categories as $category)
-                        <span class="rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700">{{ $category->name }}</span>
+                        <span class="rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700">{{ $category->name }} · {{ $category->type->label() }}</span>
                     @endforeach
                 </p>
             @endif
@@ -128,7 +136,9 @@
                 </section>
             @endcan
 
-            <section class="mt-8" aria-labelledby="fontes">
+            <hr class="divisor-patas" aria-hidden="true">
+
+            <section aria-labelledby="fontes">
                 <h2 id="fontes" class="text-xl">Fontes das informações</h2>
                 <ul class="panel mt-2 divide-y divide-slate-200 text-sm">
                     @forelse ($book->sources as $source)

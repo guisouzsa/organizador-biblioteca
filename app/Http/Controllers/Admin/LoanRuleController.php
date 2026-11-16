@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Support\Feedback;
 use App\Enums\BorrowerType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoanRulesRequest;
@@ -58,7 +59,8 @@ class LoanRuleController extends Controller
             }
         });
 
-        return redirect()->route('loan-rules.edit')->with('status', 'Regras de empréstimo salvas. Valem para novos empréstimos; os já registrados mantêm o prazo original.');
+        return redirect()->route('loan-rules.edit')->with('status', 'Regras de empréstimo salvas. Valem para novos empréstimos; os já registrados mantêm o prazo original.')
+            ->with('feedback', Feedback::success('Regras salvas', 'As regras valem para os próximos empréstimos. Os empréstimos já registrados mantêm o prazo original.'));
     }
 
     private function nullableInt(mixed $v): ?int

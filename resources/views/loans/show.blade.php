@@ -40,7 +40,7 @@
         <section class="mt-6 rounded-xl bg-white p-5 shadow-sm ring-1 ring-rose-200">
             <h2 class="font-semibold text-rose-800">Estornar empréstimo</h2>
             <p class="mt-1 text-sm text-slate-600">Para corrigir um lançamento feito por engano. O registro <strong>não é apagado</strong>: fica marcado como estornado, com motivo e autoria.</p>
-            <form method="POST" action="{{ route('loans.void', $loan) }}" class="mt-3 flex flex-wrap items-end gap-3" data-once onsubmit="return confirm('Estornar este empréstimo?')">
+            <form method="POST" action="{{ route('loans.void', $loan) }}" class="mt-3 flex flex-wrap items-end gap-3" data-once data-confirm="O empréstimo será estornado, mas o registro permanece no histórico com o motivo informado." data-confirm-title="Estornar este empréstimo?" data-confirm-label="Estornar" data-confirm-danger">
                 @csrf
                 <x-shared.input name="reason" label="Motivo do estorno" :value="''" required class="min-w-64 flex-1" />
                 <button class="rounded-md bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500">Estornar</button>

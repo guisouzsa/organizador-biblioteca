@@ -29,7 +29,7 @@
     </div>
 
     @if ($reservations->isEmpty())
-        <x-shared.empty-state :title="$history ? 'Nenhuma reserva no histórico.' : 'Nenhuma reserva ativa.'" text="Reservas aparecem aqui quando um livro não tem exemplar disponível." icon="bookmark" />
+        <x-shared.empty-state :title="$history ? 'Nenhuma reserva no histórico.' : 'Nenhuma reserva ativa.'" text="Reservas aparecem aqui quando um livro não tem exemplar disponível." icon="bookmark" gato="dormindo" />
     @else
         <div class="panel overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200 text-sm">
@@ -48,7 +48,7 @@
                             </td>
                             <td class="px-4 py-3 text-right">
                                 @can('cancel', $r)
-                                    <form method="POST" action="{{ route('reservations.cancel', $r) }}" class="inline" data-once onsubmit="return confirm('Cancelar esta reserva?')">@csrf<button class="btn btn-danger">Cancelar</button></form>
+                                    <form method="POST" action="{{ route('reservations.cancel', $r) }}" class="inline" data-once data-confirm="A reserva de {{ $r->borrower->name }} será cancelada. Se houver exemplar separado para ela, ele volta a ficar disponível." data-confirm-title="Cancelar esta reserva?" data-confirm-label="Cancelar reserva" data-confirm-cancel="Manter reserva" data-confirm-danger">@csrf<button class="btn btn-danger">Cancelar</button></form>
                                 @endcan
                             </td>
                         </tr>

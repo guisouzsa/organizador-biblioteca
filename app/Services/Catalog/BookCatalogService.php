@@ -142,7 +142,8 @@ class BookCatalogService
     {
         return [
             ...$book->only(['title', 'subtitle', 'authors', 'publisher', 'isbn10', 'isbn13', 'edition', 'publication_year',
-                'pages', 'description', 'cover_url', 'language', 'format', 'collection_id']),
+                'pages', 'description', 'cover_url', 'language', 'format', 'collection_group',
+                'material_type', 'audience', 'education_stage', 'work_id', 'collection_id']),
             'categories' => $book->categories()->orderBy('name')->pluck('name')->implode('; '),
         ];
     }

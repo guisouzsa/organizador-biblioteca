@@ -1,0 +1,120 @@
+/* =====================================================================
+   EFEITOS "GATO-LIVRO" — Biblioteca Escolar
+   CSS puro (não depende de Tailwind). Uso: ver docs/efeitos-gatinho.md
+   Tudo aqui é DECORATIVO: nunca carrega informação. Quem precisa de
+   texto/ícone com significado continua usando o sistema atual do site.
+   ===================================================================== */
+
+:root {
+    --cinza-1: #808080;
+    --cinza-2: #919191;
+    --cinza-3: #a2a2a2;
+    --cinza-4: #b3b3b3;
+    --cinza-5: #c4c4c4;
+}
+.color1 { color: var(--cinza-1); }
+.color2 { color: var(--cinza-2); }
+.color3 { color: var(--cinza-3); }
+.color4 { color: var(--cinza-4); }
+.color5 { color: var(--cinza-5); }
+.bg-color1 { background-color: var(--cinza-1); }
+.bg-color2 { background-color: var(--cinza-2); }
+.bg-color3 { background-color: var(--cinza-3); }
+.bg-color4 { background-color: var(--cinza-4); }
+.bg-color5 { background-color: var(--cinza-5); }
+
+/* Texto só para leitor de tela */
+.somente-leitor {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- 1. DIVISOR COM PATINHA ----------
+   <hr class="divisor-patas">  (hr já é ignorado por leitores de tela como "separador") */
+.divisor-patas {
+    display: flex; align-items: center; gap: 2.25rem;
+    border: 0; margin: 2rem 0; height: 1.25rem; color: var(--cinza-3);
+}
+.divisor-patas::before, .divisor-patas::after {
+    content: ""; flex: 1; border-top: 2px dashed var(--cinza-5);
+}
+.divisor-patas::after { order: 2; }
+.divisor-patas { background: url('patinha.svg') center / 1.25rem no-repeat; }
+@media (forced-colors: active) { .divisor-patas { background: none; } }
+
+/* ---------- 2. CARD COM PATINHA AO PASSAR / FOCAR ----------
+   Funciona em <a> ou <div> de card. Não muda o tamanho (sem "pulo" de layout). */
+.efeito-patinha { position: relative; transition: transform 160ms ease, box-shadow 160ms ease; }
+.efeito-patinha::after {
+    content: ""; position: absolute; top: .5rem; right: .5rem;
+    width: 1.5rem; height: 1.5rem; pointer-events: none;
+    background: url('patinha.svg') center / contain no-repeat;
+    opacity: 0; transform: rotate(-12deg) scale(.8);
+    transition: opacity 160ms ease, transform 160ms ease;
+}
+.efeito-patinha:hover, .efeito-patinha:focus-visible, .efeito-patinha:focus-within {
+    transform: translateY(-2px);
+}
+.efeito-patinha:hover::after, .efeito-patinha:focus-visible::after, .efeito-patinha:focus-within::after {
+    opacity: 1; transform: rotate(-12deg) scale(1);
+}
+
+/* ---------- 3. LINK COM SUBLINHADO ONDULADO AO PASSAR ----------
+   Só muda ao hover/foco; o contraste do texto não é alterado. */
+.link-ondulado { text-decoration: underline; text-decoration-color: transparent; text-underline-offset: .25em;
+    text-decoration-thickness: 2px; transition: text-decoration-color 140ms; }
+.link-ondulado:hover, .link-ondulado:focus-visible {
+    text-decoration-style: wavy; text-decoration-color: var(--cinza-3);
+}
+
+/* ---------- 4. GATINHO ESPIANDO NO TOPO DE UM CARD ----------
+   <div class="espia"> <img class="espia__gato" src=".../gato-espiando.svg" alt="" aria-hidden="true"> ...conteúdo... </div>
+   Reserve espaço acima (margin-top) igual à altura do gato: --espia-altura. */
+.espia { position: relative; --espia-altura: 3.25rem; margin-top: var(--espia-altura); }
+.espia__gato {
+    position: absolute; left: 1.25rem; bottom: calc(100% - 1px);
+    height: var(--espia-altura); width: auto; pointer-events: none; user-select: none;
+    animation: espia-sobe .7s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes espia-sobe { from { transform: translateY(60%); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* ---------- 5. MARCADOR DE PÁGINA (fita no canto do card) ----------
+   <div class="marca-pagina"> ... </div> — apenas enfeite no canto superior direito. */
+.marca-pagina { position: relative; }
+.marca-pagina::before {
+    content: ""; position: absolute; top: -.35rem; right: 1rem; width: 1.5rem; height: 3.1rem;
+    background: url('marca-pagina.svg') top center / contain no-repeat; pointer-events: none;
+}
+@media (forced-colors: active) { .marca-pagina::before { display: none; } }
+
+/* ---------- 6. CARREGANDO (3 patinhas pulsando) ----------
+   <span class="carregando" role="status"><span class="somente-leitor">Carregando…</span></span> */
+.carregando { display: inline-flex; gap: .35rem; align-items: center; height: 1.5rem; }
+.carregando::before, .carregando::after, .carregando > .carregando__meio {
+    content: ""; width: 1.25rem; height: 1.25rem;
+    background: url('patinha.svg') center / contain no-repeat;
+    animation: patinha-pulsa 1.2s ease-in-out infinite both;
+}
+.carregando::before { animation-delay: 0s; }
+.carregando > .carregando__meio { animation-delay: .2s; }
+.carregando::after { animation-delay: .4s; }
+@keyframes patinha-pulsa { 0%, 80%, 100% { opacity: .25; transform: scale(.85); } 40% { opacity: 1; transform: scale(1); } }
+
+/* ---------- 7. FUNDO DE PATINHAS (bem sutil) ----------
+   Use em áreas grandes e vazias (login, estado vazio). NUNCA atrás de tabelas ou texto corrido. */
+.fundo-patas { background-image: url('padrao-patas.svg'); background-size: 120px; }
+@media (forced-colors: active), print { .fundo-patas { background-image: none; } }
+
+/* ---------- 8. ENFEITE COM BALANÇO SUAVE (lápis-gato, gato dormindo) ----------
+   Imagem decorativa que "respira" devagar. Para quando o movimento é indesejado, ver abaixo. */
+.balanca { animation: balanca 4s ease-in-out infinite; transform-origin: 50% 90%; }
+@keyframes balanca { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+
+/* ---------- Acessibilidade global destes efeitos ---------- */
+@media (prefers-reduced-motion: reduce) {
+    .espia__gato, .carregando::before, .carregando::after, .carregando > .carregando__meio, .balanca { animation: none !important; }
+    .carregando::before, .carregando::after, .carregando > .carregando__meio { opacity: 1; }
+    .efeito-patinha, .efeito-patinha::after, .link-ondulado { transition: none; }
+    .efeito-patinha:hover, .efeito-patinha:focus-visible, .efeito-patinha:focus-within { transform: none; }
+}
+@media print { .espia__gato, .marca-pagina::before, .efeito-patinha::after, .carregando { display: none; } }

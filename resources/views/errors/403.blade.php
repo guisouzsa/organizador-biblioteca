@@ -1,0 +1,1 @@
+@include('errors.minimal', ['title' => 'Acesso negado', 'message' => 'Seu perfil não tem permissão para esta ação. Se você precisa dela, peça a um administrador.', 'icon' => 'lock', 'tone' => 'denied'])

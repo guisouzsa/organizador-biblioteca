@@ -11,14 +11,14 @@ class ExampleTest extends TestCase
 
     public function test_guest_is_redirected_to_login(): void
     {
-        $this->get('/')->assertRedirect('/login');
+        $this->get('/')->assertOk()->assertSee('Entrar');
         $this->get('/catalogo')->assertRedirect('/login');
     }
 
-    public function test_authenticated_home_goes_to_dashboard(): void
+    public function test_authenticated_home_shows_landing_with_panel_link(): void
     {
         $this->signIn();
 
-        $this->get('/')->assertRedirect('/painel');
+        $this->get('/')->assertOk()->assertSee('Abrir painel');
     }
 }

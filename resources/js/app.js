@@ -1,4 +1,6 @@
 import './bootstrap';
+import './ui/dialogs';
+import './ui/select';
 
 // Painel lateral: coluna fixa no desktop; no celular abre pelo botão "Mais" da barra inferior.
 const sidebar = document.getElementById('sidebar');
@@ -60,28 +62,36 @@ document.querySelectorAll('details[data-open-lg]').forEach((d) => {
     }
 });
 
-// Avisos de sucesso somem sozinhos (erros permanecem até serem lidos).
-document.querySelectorAll('[data-autohide]').forEach((el) => {
-    setTimeout(() => {
-        el.style.transition = 'opacity 300ms';
-        el.style.opacity = '0';
-        setTimeout(() => el.remove(), 320);
-    }, 6000);
-});
-
-// Aviso curto programático (ex.: leitura de código): window.notify('texto', 'ok' | 'error')
-window.notify = (message, kind = 'ok') => {
-    const region = document.getElementById('toast-region');
-    if (!region) {
+// Capas: se a imagem falhar ao carregar, troca por um estado alternativo discreto (nunca uma capa inventada).
+function coverFallback(img) {
+    if (img.dataset.failed) {
         return;
     }
-    const el = document.createElement('div');
-    el.className = 'pointer-events-auto max-w-sm rounded-md px-4 py-2.5 text-sm font-medium shadow-lg '
-        + (kind === 'error' ? 'bg-rose-700 text-white' : 'bg-slate-900 text-white');
-    el.textContent = message;
-    region.appendChild(el);
-    setTimeout(() => el.remove(), 3500);
-};
+    img.dataset.failed = '1';
+    const box = document.createElement('div');
+    box.className = img.className.replace('cover', '').trim() + ' cover cover--empty';
+    box.setAttribute('role', 'img');
+    box.setAttribute('aria-label', 'Capa indisponível');
+    box.innerHTML = '<span class="cover__label">Capa indisponível</span>';
+    img.replaceWith(box);
+}
+document.addEventListener('error', (event) => {
+    if (event.target instanceof HTMLImageElement && event.target.matches('img.cover')) {
+        coverFallback(event.target);
+    }
+}, true);
+document.querySelectorAll('img.cover').forEach((img) => {
+    if (img.complete && img.naturalWidth === 0) {
+        coverFallback(img);
+    }
+});
+
+// Busca no catálogo: mostra o indicador de carregamento enquanto a página responde.
+document.querySelectorAll('form[data-loading]').forEach((form) => {
+    form.addEventListener('submit', () => {
+        document.querySelector('[data-loading-indicator]')?.removeAttribute('hidden');
+    });
+});
 
 // Evita envio duplo de formulários (empréstimos, cadastros): desabilita o botão após o envio.
 document.querySelectorAll('form[data-once]').forEach((form) => {
@@ -91,4 +101,19 @@ document.querySelectorAll('form[data-once]').forEach((form) => {
             button.setAttribute('aria-busy', 'true');
         });
     });
+});
+
+// Cadastro bibliográfico: realça os campos próprios do acervo escolar sem esconder informação.
+document.querySelectorAll('[data-book-form]').forEach((form) => {
+    const group = form.querySelector('[data-collection-group]');
+    const schoolFields = form.querySelectorAll('[data-school-field]');
+    const update = () => {
+        const school = group?.value === 'school';
+        schoolFields.forEach((field) => {
+            field.closest('div')?.classList.toggle('book-field--contextual', school);
+            field.setAttribute('aria-disabled', String(!school));
+        });
+    };
+    group?.addEventListener('change', update);
+    update();
 });

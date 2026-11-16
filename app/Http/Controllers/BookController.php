@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\Feedback;
 use App\Enums\ErrorCode;
 use App\Exceptions\Domain\DomainException;
 use App\Http\Requests\StoreBookRequest;
@@ -34,6 +35,10 @@ class BookController extends Controller
             'publisher' => ['nullable', 'string', 'max:255'],
             'year' => ['nullable', 'integer'],
             'collection' => ['nullable', 'integer'],
+            'collection_group' => ['nullable', 'in:school,general'],
+            'material_type' => ['nullable', 'string', 'max:40'],
+            'language' => ['nullable', 'string', 'max:10'],
+            'education_stage' => ['nullable', 'string', 'max:60'],
             'archived' => ['nullable', 'boolean'],
         ]);
 
@@ -52,6 +57,9 @@ class BookController extends Controller
             'collections' => BookCollection::orderBy('name')->get(),
             'publishers' => Book::whereNotNull('publisher')->distinct()->orderBy('publisher')->pluck('publisher'),
             'years' => Book::whereNotNull('publication_year')->distinct()->orderByDesc('publication_year')->pluck('publication_year'),
+            'materialTypes' => Book::whereNotNull('material_type')->distinct()->orderBy('material_type')->pluck('material_type'),
+            'languages' => Book::whereNotNull('language')->distinct()->orderBy('language')->pluck('language'),
+            'educationStages' => Book::whereNotNull('education_stage')->distinct()->orderBy('education_stage')->pluck('education_stage'),
         ]);
     }
 
@@ -77,7 +85,8 @@ class BookController extends Controller
             $this->authorize('update', $duplicate);
             $this->catalog->update($duplicate, $data, $sources, confirmIsbnChange: true);
 
-            return redirect()->route('books.show', $duplicate)->with('status', 'Registro existente atualizado com os novos dados.');
+            return redirect()->route('books.show', $duplicate)->with('status', 'Registro existente atualizado com os novos dados.')
+                ->with('feedback', Feedback::success('Registro atualizado', "O livro “{$duplicate->title}” já existia e foi atualizado com os novos dados."));
         }
 
         // Sem ISBN: avisa sobre possíveis duplicatas, sem bloquear (RN-CAT-04).
@@ -97,7 +106,12 @@ class BookController extends Controller
             return back()->withInput()->with('duplicate_book_id', $existing?->id);
         }
 
-        return redirect()->route('books.show', $book)->with('status', 'Livro cadastrado no catálogo.');
+        return redirect()->route('books.show', $book)->with('status', 'Livro cadastrado no catálogo.')
+            ->with('feedback', Feedback::success(
+                'Livro cadastrado',
+                "“{$book->title}” foi adicionado ao catálogo e já está disponível para consulta.",
+                auth()->user()->can('copy.create') ? [['label' => 'Registrar exemplares', 'href' => route('books.copies.create', $book), 'variant' => 'secondary']] : [],
+            ));
     }
 
     public function show(Book $book): View
@@ -127,7 +141,8 @@ class BookController extends Controller
 
         $values = $book->only([
             'title', 'subtitle', 'authors', 'publisher', 'edition', 'publication_year',
-            'pages', 'description', 'cover_url', 'language', 'format', 'collection_id',
+            'pages', 'description', 'cover_url', 'language', 'format', 'collection_group',
+            'material_type', 'audience', 'education_stage', 'work_id', 'collection_id',
         ]);
         $values['isbn'] = $book->isbn13 ?? $book->isbn10;
         $values['categories'] = $book->categories->pluck('id')->all();
@@ -144,7 +159,8 @@ class BookController extends Controller
 
         $this->catalog->update($book, $request->toDto(), confirmIsbnChange: $request->boolean('confirm_isbn_change'));
 
-        return redirect()->route('books.show', $book)->with('status', 'Registro atualizado.');
+        return redirect()->route('books.show', $book)->with('status', 'Registro atualizado.')
+            ->with('feedback', Feedback::success('Livro atualizado', "As alterações em “{$book->title}” foram salvas."));
     }
 
     public function archive(Book $book): RedirectResponse

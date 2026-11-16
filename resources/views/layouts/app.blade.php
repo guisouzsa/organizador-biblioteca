@@ -3,12 +3,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#f4f1ea">
+    <meta name="theme-color" content="#f5f5f5">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title', config('app.name'))</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="{{ asset('decor/efeitos.css') }}">
+    <link rel="icon" type="image/png" href="{{ asset('decor/logo.png') }}">
     @stack('head')
 </head>
 <body class="min-h-screen font-sans antialiased">
@@ -28,7 +30,10 @@
     {{-- Cabeçalho compacto (celular/tablet) --}}
     <header data-app-header class="sticky top-0 z-30 flex h-14 items-center justify-between gap-2 border-b border-slate-200 bg-white/95 px-4 backdrop-blur-0 lg:hidden"
             style="padding-top: env(safe-area-inset-top)">
-        <a href="{{ route($user->can('dashboard.view') ? 'dashboard' : 'books.index') }}" class="min-w-0 truncate font-serif text-lg font-medium tracking-tight">{{ $libraryName }}</a>
+        <a href="{{ route($user->can('dashboard.view') ? 'dashboard' : 'books.index') }}" class="inline-flex min-h-11 items-center">
+            <img src="{{ asset('decor/logo.png') }}" alt="" width="500" height="500" class="h-11 w-11 shrink-0 object-contain">
+            <span class="ml-2 truncate font-semibold text-slate-900">{{ $libraryName }}</span>
+        </a>
         @can('catalog.view')
             <a href="{{ route('books.index') }}#q" data-focus-search aria-label="Pesquisar no catálogo"
                class="grid h-11 w-11 shrink-0 place-items-center rounded-md text-slate-700 hover:bg-slate-100">
@@ -44,10 +49,10 @@
                   max-lg:right-0 max-lg:translate-x-full max-lg:border-l max-lg:data-[open=true]:translate-x-0
                   lg:left-0 lg:w-64 lg:border-r">
         <div class="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-slate-200 px-5">
-            <div class="min-w-0">
-                <p class="eyebrow">Biblioteca</p>
-                <p class="truncate font-serif text-lg font-medium leading-tight tracking-tight">{{ $libraryName }}</p>
-            </div>
+            <a href="{{ route($user->can('dashboard.view') ? 'dashboard' : 'books.index') }}" class="inline-flex min-w-0 items-center">
+                <img src="{{ asset('decor/logo.png') }}" alt="" width="500" height="500" class="h-12 w-12 shrink-0 object-contain">
+                <span class="ml-2 min-w-0 truncate text-sm font-semibold leading-tight text-slate-900">{{ $libraryName }}</span>
+            </a>
             <button type="button" data-sidebar-close aria-label="Fechar menu" class="grid h-11 w-11 place-items-center rounded-md text-slate-600 hover:bg-slate-100 lg:hidden">
                 <x-shared.icon name="x" class="h-5 w-5" />
             </button>
@@ -109,9 +114,9 @@
         </div>
     </aside>
 
-    <div class="lg:pl-64">
-        <main id="conteudo" class="mx-auto w-full max-w-6xl px-4 pb-28 pt-6 sm:px-6 lg:px-10 lg:pb-12 lg:pt-10">
-            <x-shared.flash />
+    <div class="lg:pl-72">
+        <main id="conteudo" class="mx-auto w-full max-w-7xl px-4 pb-28 pt-6 sm:px-6 lg:px-12 lg:pb-12 lg:pt-10">
+            <x-ui.error-summary />
             @yield('content')
         </main>
     </div>
@@ -139,7 +144,7 @@
         </ul>
     </nav>
 
-    <x-shared.toast />
+    <x-ui.feedback />
     @stack('scripts')
 </body>
 </html>

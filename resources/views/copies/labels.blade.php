@@ -9,8 +9,8 @@
             #sidebar, [data-sidebar-backdrop], header, .no-print { display: none !important; }
             .lg\:pl-64 { padding-left: 0 !important; }
             main { padding: 0 !important; max-width: none !important; }
-            body { background: #fff !important; }
-            .label-card { break-inside: avoid; box-shadow: none !important; border: 1px solid #000 !important; }
+            body { background: #c4c4c4 !important; }
+            .label-card { break-inside: avoid; box-shadow: none !important; border: 1px solid #808080 !important; }
         }
     </style>
 @endpush

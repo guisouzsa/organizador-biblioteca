@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\Feedback;
 use App\Enums\BorrowerStatus;
 use App\Enums\BorrowerType;
 use App\Http\Requests\BorrowerRequest;
@@ -50,7 +51,12 @@ class BorrowerController extends Controller
     {
         $borrower = $this->borrowers->create($request->validated());
 
-        return redirect()->route('borrowers.show', $borrower)->with('status', 'Leitor cadastrado.');
+        return redirect()->route('borrowers.show', $borrower)->with('status', 'Leitor cadastrado.')
+            ->with('feedback', Feedback::success(
+                'Leitor cadastrado',
+                "{$borrower->name} foi cadastrado(a). O empréstimo depende das regras de circulação configuradas.",
+                auth()->user()->can('loan.create') ? [['label' => 'Ir ao balcão', 'href' => route('circulation.desk', ['leitor' => $borrower->id]), 'variant' => 'secondary']] : [],
+            ));
     }
 
     public function show(Borrower $borrower): View

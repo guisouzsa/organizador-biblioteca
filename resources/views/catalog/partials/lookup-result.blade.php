@@ -5,60 +5,97 @@
 @endphp
 
 @if ($status === 'invalid')
-    <div role="alert" class="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">
-        <p class="font-semibold">ISBN inválido</p>
-        <p class="mt-1">{{ $result['message'] }}</p>
-        <p class="mt-1 text-rose-700">Confira o número ou tente ler o código novamente.</p>
-    </div>
+    <x-ui.alert tone="error" title="ISBN inválido">
+        {{ $result['message'] }} Confira o número ou tente ler o código novamente.
+    </x-ui.alert>
 
 @elseif ($status === 'exists')
-    @php($book = $result['book'])
-    <div class="rounded-xl border border-amber-300 bg-amber-50 p-4">
-        <p class="text-sm font-semibold text-amber-900">Este livro já está no catálogo</p>
-        <div class="mt-3 flex gap-4">
-            <x-shared.book-cover :book="$book" class="h-28 w-20 shrink-0" />
+    @php
+        $book = $result['book'];
+    @endphp
+    <div class="panel p-4 sm:p-5">
+        <x-ui.alert tone="warning" title="Este livro já está no catálogo">Não é preciso cadastrá-lo de novo. Abra o registro ou atualize os dados.</x-ui.alert>
+        <div class="mt-4 flex gap-4">
+            <x-shared.book-cover :book="$book" class="w-24 shrink-0 sm:w-28" />
             <div class="min-w-0 text-sm">
-                <p class="font-semibold">{{ $book->title }}</p>
+                <p class="text-base font-semibold">{{ $book->title }}</p>
                 @if ($book->authors)<p class="text-slate-700">{{ $book->authors }}</p>@endif
-                <p class="font-mono text-xs text-slate-600">ISBN {{ $book->isbn13 ?? $book->isbn10 }}</p>
-                <div class="mt-3 flex flex-wrap gap-2">
-                    <a href="{{ route('books.show', $book) }}" class="rounded-md bg-white px-3 py-2 font-medium ring-1 ring-inset ring-amber-300 hover:bg-amber-100">Abrir registro</a>
-                    <a href="{{ route('books.edit', $book) }}" class="rounded-md bg-amber-600 px-3 py-2 font-medium text-white hover:bg-amber-700">Editar / atualizar dados</a>
+                <p class="catalog-id mt-1">ISBN {{ $book->isbn13 ?? $book->isbn10 }}</p>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    <a href="{{ route('books.show', $book) }}" class="btn btn-secondary">Abrir registro</a>
+                    <a href="{{ route('books.edit', $book) }}" class="btn btn-primary">Editar / atualizar dados</a>
                 </div>
             </div>
         </div>
     </div>
 
 @elseif ($status === 'not_found' || $status === 'unavailable')
-    <div role="alert" class="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-        <p class="font-semibold">{{ $status === 'not_found' ? 'Livro não encontrado' : 'Fontes indisponíveis' }}</p>
-        <p class="mt-1">{{ $result['message'] }}</p>
-        <p class="mt-1 font-mono text-xs">ISBN {{ $isbn13 }}</p>
-        <a href="{{ route('books.create', ['isbn' => $isbn13]) }}" class="mt-3 inline-block rounded-md bg-amber-600 px-3 py-2 font-medium text-white hover:bg-amber-700">Cadastrar manualmente com este ISBN</a>
-    </div>
+    <x-ui.alert tone="warning" :title="$status === 'not_found' ? 'Livro não encontrado' : 'Fontes indisponíveis'">
+        {{ $result['message'] }}
+        <span class="catalog-id mt-1 block">ISBN {{ $isbn13 }}</span>
+        <a href="{{ route('books.create', ['isbn' => $isbn13]) }}" class="btn btn-primary mt-3">Cadastrar manualmente com este ISBN</a>
+    </x-ui.alert>
 
 @elseif ($status === 'found')
+    @php
+        $cover = $values['cover_url'] ?? null;
+        $coverSource = null;
+        foreach ($result['sources'] as $source) {
+            if ($cover && ($source['cover_url'] ?? null) === $cover) {
+                $coverSource = \App\Models\BookSource::providerLabel($source['provider']);
+                break;
+            }
+        }
+    @endphp
     <div class="space-y-5">
-        <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
-            <p class="font-semibold">Resultado encontrado — confira os dados antes de salvar</p>
-            <p class="mt-1">
-                Fontes consultadas:
-                @foreach ($result['sources'] as $source)
-                    <span class="mr-1 inline-block rounded-md bg-white px-2 py-0.5 text-xs font-medium ring-1 ring-emerald-300">{{ \App\Models\BookSource::providerLabel($source['provider']) }}</span>
-                @endforeach
-            </p>
-            @foreach ($result['errors'] as $provider => $error)
-                <p class="mt-1 text-amber-800">{{ \App\Models\BookSource::providerLabel($provider) }} não respondeu e foi ignorada.</p>
-            @endforeach
-        </div>
+        {{-- Resumo: capa + dados encontrados, antes do formulário editável --}}
+        <section class="panel p-4 sm:p-5" aria-labelledby="achado">
+            <div class="flex gap-4 sm:gap-5">
+                <figure class="w-24 shrink-0 sm:w-32">
+                    @if ($cover)
+                        <img src="{{ $cover }}"
+                             alt="Capa de {{ $values['title'] ?? 'livro' }}"
+                             width="200" height="300"
+                             referrerpolicy="no-referrer"
+                             decoding="async"
+                             loading="eager"
+                             class="cover w-full"
+                             onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:this.className.replace('cover','').trim()+' cover cover--empty',role:'img',innerHTML:'<span class=\'cover__label\'>Capa indisponível</span>'}))">
+                        @if ($coverSource)<figcaption class="mt-1.5 text-center text-[0.6875rem] text-slate-500">Capa: {{ $coverSource }}</figcaption>@endif
+                    @else
+                        <div class="cover cover--empty w-full" role="img" aria-label="Nenhuma fonte trouxe a capa deste livro"><span class="cover__label">Capa não encontrada nas fontes</span></div>
+                    @endif
+                </figure>
+                <div class="min-w-0">
+                    <p class="eyebrow">Livro Encontrado</p>
+                    <h2 id="achado" class="mt-0.5 text-xl leading-snug">{{ $values['title'] ?? 'Sem título' }}</h2>
+                    @if (! empty($values['authors']))<p class="mt-1 text-sm text-slate-700">{{ $values['authors'] }}</p>@endif
+                    <p class="mt-1 text-xs text-slate-600">{{ collect([$values['publisher'] ?? null, $values['publication_year'] ?? null])->filter()->implode(' · ') }}</p>
+                    <p class="catalog-id mt-1">ISBN {{ $isbn13 }}</p>
+                    <p class="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-slate-600">
+                        Fontes:
+                        @foreach ($result['sources'] as $source)
+                            <span class="rounded-sm bg-slate-100 px-2 py-0.5 font-medium text-slate-700">{{ \App\Models\BookSource::providerLabel($source['provider']) }}</span>
+                        @endforeach
+                    </p>
+                </div>
+            </div>
+            <p class="mt-4 border-t border-cinza-5 pt-3 text-sm text-slate-600">Confira os dados com o livro em mãos. Todos os campos abaixo podem ser editados e nada é gravado até você confirmar.</p>
+            @if (! $cover)
+                <p class="mt-1 text-sm text-slate-600">Sem capa não há problema: o livro pode ser salvo normalmente e a capa adicionada depois.</p>
+            @endif
+        </section>
+
+        @foreach ($result['errors'] as $provider => $error)
+            <x-ui.alert tone="info">{{ \App\Models\BookSource::providerLabel($provider) }} não respondeu agora. Os dados acima vêm das demais fontes e continuam editáveis.</x-ui.alert>
+        @endforeach
 
         @if ($result['divergences'])
-            <div role="alert" class="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-                <p class="font-semibold">Divergência entre fontes</p>
-                <p class="mt-1">As fontes trazem valores diferentes. Corrija os campos abaixo conforme o livro físico.</p>
+            <x-ui.alert tone="warning" title="Divergência entre fontes">
+                As fontes trazem valores diferentes. Corrija os campos conforme o livro físico.
                 <div class="mt-3 overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                        <thead><tr class="text-amber-800">
+                    <table data-keep-table class="w-full text-left text-xs">
+                        <thead><tr>
                             <th class="pb-1 pr-4 font-medium">Campo</th>
                             @foreach ($result['sources'] as $source)
                                 <th class="pb-1 pr-4 font-medium">{{ \App\Models\BookSource::providerLabel($source['provider']) }}</th>
@@ -76,17 +113,10 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </x-ui.alert>
         @endif
 
-        <div class="panel flex gap-4 p-4">
-            @if (! empty($values['cover_url']))
-                <img src="{{ $values['cover_url'] }}" alt="Capa encontrada" referrerpolicy="no-referrer" class="h-40 w-28 shrink-0 rounded-md bg-slate-100 object-cover shadow-sm">
-            @endif
-            <p class="self-center text-sm text-slate-600">Todos os campos podem ser editados antes de salvar. Nada é gravado até você confirmar.</p>
-        </div>
-
-        <div class="panel p-6">
+        <div class="panel p-4 sm:p-6">
             @include('catalog.partials.form', [
                 'action' => route('books.store'),
                 'method' => 'POST',

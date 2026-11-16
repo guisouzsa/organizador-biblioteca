@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\Feedback;
 use App\Enums\ErrorCode;
 use App\Exceptions\Domain\DomainException;
 use App\Http\Requests\ReserveRequest;
@@ -60,7 +61,8 @@ class ReservationController extends Controller
         $reservation = $this->reservations->reserve($book, $matches->first());
 
         return redirect()->route('reservations.index', ['livro' => $book->id])
-            ->with('status', "Reserva registrada para {$reservation->borrower->name}. Posição na fila: {$reservation->queuePosition()}.");
+            ->with('status', "Reserva registrada para {$reservation->borrower->name}. Posição na fila: {$reservation->queuePosition()}.")
+            ->with('feedback', Feedback::success('Reserva criada', "{$reservation->borrower->name} entrou na fila de “{$book->title}”, na posição {$reservation->queuePosition()}. Quando um exemplar for devolvido, ele será separado para essa reserva."));
     }
 
     public function cancel(Request $request, Reservation $reservation): RedirectResponse

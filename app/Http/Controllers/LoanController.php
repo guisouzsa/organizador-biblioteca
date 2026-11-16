@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\Feedback;
 use App\Enums\CopyCondition;
 use App\Http\Requests\CheckoutRequest;
 use App\Http\Requests\ReturnRequest;
@@ -63,7 +64,13 @@ class LoanController extends Controller
         $loan = $this->loans->checkout($request->validated('copy_code'), $borrower, $request->boolean('acknowledge_overdue'));
 
         return redirect()->route('circulation.desk', ['leitor' => $borrower->id])
-            ->with('status', "Empréstimo registrado: {$loan->copy->book->title} ({$loan->copy->code()}). Devolver até ".$loan->due_on->format('d/m/Y').'.');
+            ->with('status', "Empréstimo registrado: {$loan->copy->book->title} ({$loan->copy->code()}). Devolver até ".$loan->due_on->format('d/m/Y').'.')
+            ->with('feedback', Feedback::success(
+                'Empréstimo registrado',
+                "“{$loan->copy->book->title}” ({$loan->copy->code()}) foi emprestado a {$borrower->name}. Devolução até ".$loan->due_on->format('d/m/Y').'.',
+                [],
+                '#copy_code',
+            ));
     }
 
     public function return(ReturnRequest $request): RedirectResponse
@@ -81,7 +88,13 @@ class LoanController extends Controller
             $message .= " ATENÇÃO: reservado para {$result['held_for']->name} — separe o exemplar.";
         }
 
-        return redirect()->route('circulation.desk', $hint ? ['leitor' => $hint->id] : [])->with('status', $message);
+        $feedback = Feedback::success('Devolução registrada', trim(str_replace('ATENÇÃO: ', '', $message)), [], '#return_code');
+        if ($result['held_for']) {
+            $feedback['tone'] = 'warning';
+            $feedback['title'] = 'Devolução registrada: separe o exemplar';
+        }
+
+        return redirect()->route('circulation.desk', $hint ? ['leitor' => $hint->id] : [])->with('status', $message)->with('feedback', $feedback);
     }
 
     public function renew(Loan $loan): RedirectResponse

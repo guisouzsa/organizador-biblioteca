@@ -1,0 +1,1 @@
+@include('errors.minimal', ['title' => 'Algo deu errado', 'message' => 'Não foi possível concluir agora. Nada foi perdido do que já estava salvo. Tente novamente em instantes.', 'icon' => 'xcircle', 'tone' => 'error'])

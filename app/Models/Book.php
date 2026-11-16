@@ -19,6 +19,7 @@ class Book extends Model
     protected $fillable = [
         'title', 'subtitle', 'authors', 'publisher', 'isbn10', 'isbn13', 'edition',
         'publication_year', 'pages', 'description', 'cover_url', 'language', 'format',
+        'work_id', 'collection_group', 'material_type', 'audience', 'education_stage',
         'collection_id', 'archived_at',
     ];
 
@@ -80,6 +81,11 @@ class Book extends Model
         return $this->belongsTo(BookCollection::class, 'collection_id');
     }
 
+    public function work(): BelongsTo
+    {
+        return $this->belongsTo(BookWork::class, 'work_id');
+    }
+
     public function sources(): HasMany
     {
         return $this->hasMany(BookSource::class);
@@ -89,6 +95,23 @@ class Book extends Model
     public function authorsList(): array
     {
         return array_values(array_filter(array_map('trim', explode(';', (string) $this->authors))));
+    }
+
+    public function collectionGroupLabel(): string
+    {
+        return $this->collection_group === 'school' ? 'Acervo escolar' : 'Acervo geral';
+    }
+
+    public function materialTypeLabel(): ?string
+    {
+        return match ($this->material_type) {
+            'textbook' => 'Livro didático', 'support' => 'Material de apoio',
+            'literature' => 'Literatura', 'technical' => 'Técnico',
+            'academic' => 'Acadêmico', 'reference' => 'Referência',
+            'popular_science' => 'Divulgação científica', 'other' => 'Outro',
+            null, '' => null,
+            default => $this->material_type,
+        };
     }
 
     /** Busca por título, subtítulo, autores ou ISBN. */
@@ -120,7 +143,11 @@ class Book extends Model
             ->when($filters['category'] ?? null, fn (Builder $q, $id) => $q->whereHas('categories', fn (Builder $c) => $c->where('categories.id', $id)))
             ->when($filters['publisher'] ?? null, fn (Builder $q, $v) => $q->where('publisher', $v))
             ->when($filters['year'] ?? null, fn (Builder $q, $v) => $q->where('publication_year', $v))
-            ->when($filters['collection'] ?? null, fn (Builder $q, $v) => $q->where('collection_id', $v));
+            ->when($filters['collection'] ?? null, fn (Builder $q, $v) => $q->where('collection_id', $v))
+            ->when($filters['collection_group'] ?? null, fn (Builder $q, $v) => $q->where('collection_group', $v))
+            ->when($filters['material_type'] ?? null, fn (Builder $q, $v) => $q->where('material_type', $v))
+            ->when($filters['language'] ?? null, fn (Builder $q, $v) => $q->where('language', $v))
+            ->when($filters['education_stage'] ?? null, fn (Builder $q, $v) => $q->where('education_stage', $v));
     }
 
     private function likeOperator(): string

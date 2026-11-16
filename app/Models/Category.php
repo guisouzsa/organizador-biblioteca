@@ -6,11 +6,13 @@ use App\Enums\CategoryType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class Category extends Model
 {
-    protected $fillable = ['name', 'slug', 'type', 'archived_at'];
+    protected $fillable = ['name', 'slug', 'type', 'parent_id', 'archived_at'];
 
     protected function casts(): array
     {
@@ -20,6 +22,16 @@ class Category extends Model
     public function books(): BelongsToMany
     {
         return $this->belongsToMany(Book::class, 'book_category');
+    }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    public function children(): HasMany
+    {
+        return $this->hasMany(self::class, 'parent_id');
     }
 
     public function scopeActive(Builder $query): Builder

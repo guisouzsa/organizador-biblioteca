@@ -1,0 +1,1 @@
+@include('errors.minimal', ['title' => 'Sessão expirada', 'message' => 'Por segurança, a página ficou aberta por muito tempo. Volte, recarregue e envie novamente.', 'icon' => 'alert', 'tone' => 'warning'])

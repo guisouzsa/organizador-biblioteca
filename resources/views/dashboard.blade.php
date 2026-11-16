@@ -13,24 +13,18 @@
     </x-shared.page-header>
 
     @if (! $rulesConfigured || $typesWithoutRule)
-        <div role="alert" class="mb-8 flex items-start gap-3 rounded-md border-l-4 border-amber-600 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-            <x-shared.icon name="alert" class="mt-0.5 h-5 w-5 shrink-0" />
-            <div>
-                <p class="font-semibold">Empréstimos bloqueados até a configuração das regras</p>
-                <p class="mt-0.5">
-                    @if (! $rulesConfigured)
-                        Nenhuma regra de empréstimo foi definida. O sistema não inventa prazos nem limites: a escola precisa configurá-los.
-                    @else
-                        Faltam regras para: {{ collect($typesWithoutRule)->map->label()->implode(', ') }}.
-                    @endif
-                    @can('settings.manage')
-                        <a href="{{ route('loan-rules.edit') }}" class="font-semibold underline">Configurar agora</a>.
-                    @else
-                        Peça a um administrador que as configure.
-                    @endcan
-                </p>
-            </div>
-        </div>
+        <x-ui.alert tone="warning" title="Empréstimos bloqueados até a configuração das regras" class="mb-8">
+            @if (! $rulesConfigured)
+                Nenhuma regra de empréstimo foi definida. O sistema não inventa prazos nem limites: a escola precisa configurá-los.
+            @else
+                Faltam regras para: {{ collect($typesWithoutRule)->map->label()->implode(', ') }}.
+            @endif
+            @can('settings.manage')
+                <a href="{{ route('loan-rules.edit') }}" class="font-semibold underline">Configurar agora</a>.
+            @else
+                Peça a um administrador que as configure.
+            @endcan
+        </x-ui.alert>
     @endif
 
     {{-- Três números que orientam o dia; o restante fica em segundo plano --}}
@@ -47,11 +41,13 @@
         <x-shared.stat-card label="Reservas" :value="$stats['reservations_pending']" :href="route('reservations.index')" :hint="$stats['reservations_ready'].' prontas p/ retirada'" />
     </section>
 
-    <div class="mt-12 grid gap-10 lg:grid-cols-2">
+    <hr class="divisor-patas mt-10" aria-hidden="true">
+
+    <div class="grid gap-10 lg:grid-cols-2">
         <section aria-labelledby="atrasos">
             <div class="flex items-baseline justify-between border-b border-slate-300 pb-2">
                 <h2 id="atrasos" class="text-xl">Em atraso</h2>
-                <a href="{{ route('loans.index', ['situacao' => 'overdue']) }}" class="text-sm font-medium text-indigo-700 hover:underline">Ver todos</a>
+                <a href="{{ route('loans.index', ['situacao' => 'overdue']) }}" class="link-ondulado text-sm font-medium text-indigo-700">Ver todos</a>
             </div>
             <ul>
                 @forelse ($overdue as $loan)
@@ -73,7 +69,7 @@
         <section aria-labelledby="prontas">
             <div class="flex items-baseline justify-between border-b border-slate-300 pb-2">
                 <h2 id="prontas" class="text-xl">Prontas para retirada</h2>
-                <a href="{{ route('reservations.index') }}" class="text-sm font-medium text-indigo-700 hover:underline">Ver reservas</a>
+                <a href="{{ route('reservations.index') }}" class="link-ondulado text-sm font-medium text-indigo-700">Ver reservas</a>
             </div>
             <ul>
                 @forelse ($ready as $reservation)
@@ -93,9 +89,12 @@
 
     @if ($stats['books'] === 0)
         <div class="mt-10">
-            <x-shared.empty-state title="A biblioteca ainda está vazia" text="Comece cadastrando livros no catálogo; depois registre os exemplares físicos e os leitores." icon="book">
+            <x-shared.empty-state title="A biblioteca ainda está vazia" text="Comece cadastrando livros no catálogo; depois registre os exemplares físicos e os leitores." icon="book" gato="dormindo">
                 @can('catalog.create')<a href="{{ route('books.scanner') }}" class="btn btn-primary">Escanear primeiro livro</a>@endcan
             </x-shared.empty-state>
         </div>
     @endif
+    <div class="mt-12 flex justify-end" aria-hidden="true">
+        <x-shared.gato nome="lapis" class="balanca h-16 w-auto opacity-80" />
+    </div>
 @endsection

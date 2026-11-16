@@ -103,7 +103,7 @@
                 <section class="panel p-5">
                     <h2 class="font-semibold">Alterar situação</h2>
                     <form method="POST" action="{{ route('copies.transition', $copy) }}" class="mt-3 space-y-3" data-once
-                          onsubmit="return confirm('Confirmar a mudança de situação deste exemplar?')">
+                          data-confirm="A situação do exemplar {{ $copy->code() }} será alterada e ficará registrada no histórico." data-confirm-title="Alterar a situação do exemplar?" data-confirm-label="Alterar situação">
                         @csrf
                         <div>
                             <label for="status" class="block text-sm font-medium text-slate-700">Nova situação</label>

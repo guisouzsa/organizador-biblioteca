@@ -17,8 +17,14 @@
         @endcan
     </x-shared.page-header>
 
-    <form method="GET" action="{{ route('books.index') }}" role="search" aria-label="Pesquisar no catálogo">
+    <form method="GET" action="{{ route('books.index') }}" role="search" aria-label="Pesquisar no catálogo" data-loading>
         <input type="hidden" name="vista" value="{{ $view }}">
+
+        <div class="catalog-scope mb-5 grid grid-cols-3 gap-1 rounded-xl bg-slate-100 p-1" aria-label="Grupo do acervo">
+            <a href="{{ route('books.index', array_filter([...request()->except('page', 'collection_group')])) }}" @if(empty($filters['collection_group'])) aria-current="page" @endif class="catalog-scope__item {{ empty($filters['collection_group']) ? 'is-active' : '' }}">Todo o acervo</a>
+            <a href="{{ route('books.index', [...request()->except('page'), 'collection_group' => 'school']) }}" @if(($filters['collection_group'] ?? null) === 'school') aria-current="page" @endif class="catalog-scope__item {{ ($filters['collection_group'] ?? null) === 'school' ? 'is-active' : '' }}"><x-shared.icon name="book" class="hidden h-4 w-4 sm:block" /> Escolar</a>
+            <a href="{{ route('books.index', [...request()->except('page'), 'collection_group' => 'general']) }}" @if(($filters['collection_group'] ?? null) === 'general') aria-current="page" @endif class="catalog-scope__item {{ ($filters['collection_group'] ?? null) === 'general' ? 'is-active' : '' }}"><x-shared.icon name="grid" class="hidden h-4 w-4 sm:block" /> Geral</a>
+        </div>
 
         <div>
             <label for="q" class="sr-only">Buscar por título, autor ou ISBN</label>
@@ -38,7 +44,16 @@
             </summary>
             <div class="grid gap-3 border-t border-slate-200 pt-3 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
-                    <label for="category" class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Disciplina</label>
+                    <label for="material_type" class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Tipo de material</label>
+                    <select id="material_type" name="material_type" class="field">
+                        <option value="">Todos</option>
+                        @foreach ($materialTypes as $type)
+                            <option value="{{ $type }}" @selected(($filters['material_type'] ?? null) === $type)>{{ (new \App\Models\Book(['material_type' => $type]))->materialTypeLabel() }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="category" class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Classificação</label>
                     <select id="category" name="category" class="field">
                         <option value="">Todas</option>
                         @foreach ($categories as $category)
@@ -46,6 +61,26 @@
                         @endforeach
                     </select>
                 </div>
+                <div>
+                    <label for="language" class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Idioma</label>
+                    <select id="language" name="language" class="field">
+                        <option value="">Todos</option>
+                        @foreach ($languages as $language)
+                            <option value="{{ $language }}" @selected(($filters['language'] ?? null) === $language)>{{ $language }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                @if (($filters['collection_group'] ?? null) !== 'general')
+                    <div>
+                        <label for="education_stage" class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Etapa de ensino</label>
+                        <select id="education_stage" name="education_stage" class="field">
+                            <option value="">Todas</option>
+                            @foreach ($educationStages as $stage)
+                                <option value="{{ $stage }}" @selected(($filters['education_stage'] ?? null) === $stage)>{{ $stage }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
                 <div>
                     <label for="publisher" class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Editora</label>
                     <select id="publisher" name="publisher" class="field">
@@ -86,6 +121,10 @@
         </details>
     </form>
 
+    <div data-loading-indicator hidden class="mt-4 flex items-center gap-2 text-sm text-slate-600">
+        <span class="carregando" role="status"><span class="carregando__meio"></span><span class="somente-leitor">Buscando</span></span> Buscando no catálogo…
+    </div>
+
     <div class="mt-6 flex items-center justify-between border-b border-slate-300 pb-2">
         <p class="text-sm text-slate-600" aria-live="polite">
             @if ($books->count()) {{ $books->firstItem() }}–{{ $books->lastItem() }} de {{ $books->total() }} @endif
@@ -105,7 +144,7 @@
                     <a href="{{ route('books.index') }}" class="btn btn-secondary">Limpar filtros</a>
                 </x-shared.empty-state>
             @else
-                <x-shared.empty-state title="O catálogo ainda não tem livros." text="Escaneie o código de barras de um livro ou cadastre-o manualmente." icon="book">
+                <x-shared.empty-state title="O catálogo ainda não tem livros." text="Escaneie o código de barras de um livro ou cadastre-o manualmente." icon="book" gato="dormindo">
                     @can('catalog.create')<a href="{{ route('books.scanner') }}" class="btn btn-primary">Escanear livro</a>@endcan
                 </x-shared.empty-state>
             @endif
@@ -123,15 +162,17 @@
             <ul class="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
                 @foreach ($books as $book)
                     @php([$tone, $text] = $availability($book))
-                    <li class="relative">
+                    <li class="efeito-patinha relative">
                         <x-shared.book-cover :book="$book" class="w-full" />
-                        <h2 class="mt-3 font-serif text-[0.95rem] leading-snug">
+                        <h2 class="mt-3 font-display text-[0.95rem] leading-snug">
                             <a href="{{ route('books.show', $book) }}" class="after:absolute after:inset-0 hover:text-indigo-700">{{ $book->title }}</a>
                         </h2>
                         @if ($book->authors)<p class="mt-0.5 truncate text-xs text-slate-600">{{ $book->authors }}</p>@endif
                         <p class="mt-0.5 truncate text-xs text-slate-500">{{ collect([$book->publisher, $book->publication_year])->filter()->implode(' · ') }}</p>
                         @if ($book->isbn13 ?? $book->isbn10)<p class="catalog-id mt-1 truncate">ISBN {{ $book->isbn13 ?? $book->isbn10 }}</p>@endif
                         <p class="mt-2 flex flex-wrap gap-1">
+                            <x-shared.badge :tone="$book->collection_group === 'school' ? 'sky' : 'indigo'">{{ $book->collectionGroupLabel() }}</x-shared.badge>
+                            @if ($book->materialTypeLabel())<x-shared.badge>{{ $book->materialTypeLabel() }}</x-shared.badge>@endif
                             <x-shared.badge :tone="$tone">{{ $text }}</x-shared.badge>
                             @if ($book->isArchived())<x-shared.badge>Arquivado</x-shared.badge>@endif
                         </p>
@@ -145,13 +186,15 @@
                     <li class="relative flex gap-4 border-b border-slate-200 py-4">
                         <x-shared.book-cover :book="$book" class="w-16 shrink-0 sm:w-20" />
                         <div class="min-w-0 flex-1">
-                            <h2 class="font-serif text-lg leading-snug">
+                            <h2 class="font-display text-lg leading-snug">
                                 <a href="{{ route('books.show', $book) }}" class="after:absolute after:inset-0 hover:text-indigo-700">{{ $book->title }}</a>
                             </h2>
                             @if ($book->authors)<p class="mt-0.5 truncate text-sm text-slate-700">{{ $book->authors }}</p>@endif
                             <p class="mt-0.5 text-xs text-slate-500">{{ collect([$book->publisher, $book->edition ? $book->edition.' ed.' : null, $book->publication_year])->filter()->implode(' · ') }}</p>
                             @if ($book->isbn13 ?? $book->isbn10)<p class="catalog-id mt-1">ISBN {{ $book->isbn13 ?? $book->isbn10 }}</p>@endif
                             <p class="mt-2 flex flex-wrap gap-1.5">
+                                <x-shared.badge :tone="$book->collection_group === 'school' ? 'sky' : 'indigo'">{{ $book->collectionGroupLabel() }}</x-shared.badge>
+                                @if ($book->materialTypeLabel())<x-shared.badge>{{ $book->materialTypeLabel() }}</x-shared.badge>@endif
                                 <x-shared.badge :tone="$tone">{{ $text }}</x-shared.badge>
                                 @if ($book->isArchived())<x-shared.badge>Arquivado</x-shared.badge>@endif
                                 @foreach ($book->categories->take(2) as $category)

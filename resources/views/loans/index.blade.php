@@ -30,7 +30,7 @@
     </form>
 
     @if ($loans->isEmpty())
-        <div class="mt-8"><x-shared.empty-state :title="$situation === 'overdue' ? 'Nenhum empréstimo em atraso.' : 'Nenhum empréstimo encontrado.'" text="Os empréstimos registrados no balcão aparecem aqui." icon="list" /></div>
+        <div class="mt-8"><x-shared.empty-state :title="$situation === 'overdue' ? 'Nenhum empréstimo em atraso.' : 'Nenhum empréstimo encontrado.'" text="Os empréstimos registrados no balcão aparecem aqui." icon="list" gato="dormindo" /></div>
     @else
         <div class="panel mt-6 overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200 text-sm">

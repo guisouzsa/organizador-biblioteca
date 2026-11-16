@@ -13,6 +13,8 @@ function initScanner(root) {
         placeholder: document.getElementById('scanner-placeholder'),
         frame: document.getElementById('scanner-frame'),
         toggle: document.getElementById('scanner-toggle'),
+        toggleText: document.getElementById('scanner-toggle-text'),
+        manualLink: document.getElementById('manual-register'),
         device: document.getElementById('scanner-device'),
         status: document.getElementById('scanner-status'),
         statusText: document.getElementById('scanner-status-text'),
@@ -38,9 +40,89 @@ function initScanner(root) {
     let handling = false; // evita leituras duplicadas enquanto o mesmo código está na frente da câmera
     let lastRejected = { code: null, at: 0 };
 
+    // Tentativas malsucedidas: uma tentativa = uma sessão de câmera que termina sem ler um ISBN
+    // (tempo esgotado, ou o operador parou a câmera após alguns segundos). Duas seguidas abrem o modal de ajuda.
+    const ATTEMPT_TIMEOUT_MS = 20000;
+    const MIN_ATTEMPT_MS = 6000;
+    let failures = 0;
+    let attemptTimer = null;
+    let attemptStartedAt = 0;
+    let failureModalOpen = false;
+
+    function manualUrl() {
+        const base = root.dataset.manualUrl;
+        const typed = (els.manualInput.value || '').trim();
+        return typed ? `${base}?isbn=${encodeURIComponent(typed)}` : base;
+    }
+
+    function clearAttemptTimer() {
+        clearTimeout(attemptTimer);
+        attemptTimer = null;
+    }
+
+    function registerFailure(message) {
+        failures += 1;
+        if (failures >= 2) {
+            showFailureModal();
+        } else {
+            setState('error', message);
+        }
+    }
+
+    function showFailureModal() {
+        if (failureModalOpen || !window.UI) {
+            return;
+        }
+        failureModalOpen = true;
+        setState('error', 'Não conseguimos identificar o livro.');
+        window.UI.show({
+            tone: 'warning',
+            title: 'Não conseguimos identificar o livro',
+            message: 'Não foi possível realizar a leitura do código de barras. Você pode tentar novamente ou cadastrar os dados do livro manualmente.',
+            actions: [
+                { label: 'Cadastrar manualmente', href: manualUrl(), variant: 'secondary' },
+                { label: 'Tentar novamente', value: 'retry', variant: 'primary' },
+            ],
+            focus: '#scanner-toggle',
+        }).then((value) => {
+            failureModalOpen = false;
+            failures = 0; // recomeça a contagem: o modal não reaparece a cada falha
+            if (value === 'retry') {
+                startCamera();
+            }
+        });
+    }
+
+    function cameraProblemModal(error) {
+        if (!window.UI) {
+            return;
+        }
+        const denied = error && (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError');
+        window.UI.show({
+            tone: 'warning',
+            title: denied ? 'Permissão da câmera negada' : 'Câmera indisponível',
+            message: denied
+                ? 'Sem acesso à câmera não dá para ler o código. Libere a câmera nas configurações do navegador ou siga sem ela: digite o ISBN ou cadastre o livro manualmente.'
+                : 'Não foi possível usar a câmera neste aparelho. Você pode digitar o ISBN ou cadastrar o livro manualmente.',
+            actions: [
+                { label: 'Cadastrar manualmente', href: manualUrl(), variant: 'secondary' },
+                { label: 'Digitar o ISBN', value: 'isbn', variant: 'primary' },
+            ],
+        }).then((value) => {
+            if (value === 'isbn') {
+                els.manualInput.focus();
+            }
+        });
+    }
+
     function setState(state, text) {
         els.status.dataset.state = state;
         els.statusText.textContent = text;
+        const loading = document.getElementById('scanner-loading');
+        if (loading) {
+            loading.classList.toggle('hidden', state !== 'searching');
+            loading.classList.toggle('flex', state === 'searching');
+        }
     }
 
     function isRunning() {
@@ -48,6 +130,7 @@ function initScanner(root) {
     }
 
     function stopCamera() {
+        clearAttemptTimer();
         session += 1;
         if (controls) {
             try {
@@ -64,7 +147,7 @@ function initScanner(root) {
         els.video.srcObject = null;
         els.placeholder.classList.remove('hidden');
         els.frame.classList.add('hidden');
-        els.toggle.textContent = 'Iniciar câmera';
+        els.toggleText.textContent = 'Iniciar câmera';
     }
 
     function describeCameraError(error) {
@@ -97,6 +180,7 @@ function initScanner(root) {
             });
             els.device.value = devices.some((d) => d.deviceId === activeDeviceId) ? activeDeviceId : '';
             els.device.disabled = devices.length < 2;
+            els.device.dispatchEvent(new Event('ui:sync'));
         } catch {
             els.device.disabled = true;
         }
@@ -149,14 +233,23 @@ function initScanner(root) {
 
             els.placeholder.classList.add('hidden');
             els.frame.classList.remove('hidden');
-            els.toggle.textContent = 'Parar câmera';
+            els.toggleText.textContent = 'Parar câmera';
             setState('scanning', 'Lendo código… aproxime o código de barras e mantenha-o dentro da moldura.');
+            attemptStartedAt = Date.now();
+            clearAttemptTimer();
+            attemptTimer = setTimeout(() => {
+                if (isRunning()) {
+                    stopCamera();
+                    registerFailure('Não conseguimos ler o código desta vez. Aproxime o livro, melhore a iluminação e toque em “Iniciar câmera”.');
+                }
+            }, ATTEMPT_TIMEOUT_MS);
 
             const track = els.video.srcObject?.getVideoTracks?.()[0];
             await loadDevices(track?.getSettings?.().deviceId);
         } catch (error) {
             stopCamera();
             setState('error', describeCameraError(error));
+            cameraProblemModal(error); // permissão negada / sem câmera: alternativa manual imediata, sem contar tentativas
         } finally {
             starting = false;
         }
@@ -181,6 +274,7 @@ function initScanner(root) {
         }
 
         handling = true;
+        failures = 0;
         stopCamera(); // interrompe novas leituras e libera a câmera
         setState('detected', `ISBN identificado: ${code}`);
         lookup(code);
@@ -227,6 +321,10 @@ function initScanner(root) {
             };
             const [state, text] = messages[data.status] ?? ['done', 'Consulta concluída.'];
             setState(state, text);
+            els.manualLink.href = manualUrl();
+            if (data.status === 'found' || data.status === 'exists') {
+                failures = 0;
+            }
 
             els.result.focus({ preventScroll: true });
             els.result.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -238,10 +336,16 @@ function initScanner(root) {
     }
 
     // Eventos
+    els.manualInput.addEventListener('input', () => { els.manualLink.href = manualUrl(); });
     els.toggle.addEventListener('click', () => {
         if (isRunning()) {
+            const elapsed = Date.now() - attemptStartedAt;
             stopCamera();
-            setState('idle', 'Câmera desligada.');
+            if (elapsed >= MIN_ATTEMPT_MS) {
+                registerFailure('A câmera foi parada sem ler um código. Tente de novo ou digite o ISBN abaixo.');
+            } else {
+                setState('idle', 'Câmera desligada.');
+            }
         } else {
             startCamera();
         }

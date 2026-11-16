@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\Feedback;
 use App\Enums\CopyCondition;
 use App\Enums\CopyStatus;
 use App\Http\Requests\RegisterCopiesRequest;
@@ -94,6 +95,10 @@ class CopyController extends Controller
         $copies = $this->registration->register($book, (int) $request->validated('quantity'), $request->validated());
 
         return redirect()->route('copies.labels', ['ids' => $copies->pluck('id')->all(), 'novo' => 1])
+            ->with('feedback', Feedback::success(
+                $copies->count() === 1 ? 'Exemplar registrado' : 'Exemplares registrados',
+                $copies->count().($copies->count() === 1 ? ' exemplar foi registrado' : ' exemplares foram registrados').' de “'.$book->title.'” ('.$copies->first()->activeBarcode->code.($copies->count() > 1 ? ' a '.$copies->last()->activeBarcode->code : '').'). As etiquetas estão prontas para impressão.'
+            ))
             ->with('status', $copies->count().' exemplar(es) registrado(s): '.$copies->first()->activeBarcode->code.($copies->count() > 1 ? ' a '.$copies->last()->activeBarcode->code : '').'.');
     }
 

@@ -18,6 +18,7 @@ abstract class BookRequest extends FormRequest
             'isbn13' => $parsed['isbn13'],
             'isbn10' => $parsed['isbn10'],
             'authors' => $this->normalizeAuthors($this->input('authors')),
+            'collection_group' => $this->input('collection_group', 'general'),
         ]);
     }
 
@@ -44,6 +45,11 @@ abstract class BookRequest extends FormRequest
             'cover_url' => ['nullable', 'url:http,https', 'max:2048'],
             'language' => ['nullable', 'string', 'max:10'],
             'format' => ['nullable', 'string', 'max:50'],
+            'collection_group' => ['required', Rule::in(['school', 'general'])],
+            'material_type' => ['nullable', 'string', 'max:40'],
+            'audience' => ['nullable', 'string', 'max:60'],
+            'education_stage' => ['nullable', 'string', 'max:60'],
+            'work_id' => ['nullable', 'integer', Rule::exists('book_works', 'id')],
             'categories' => ['nullable', 'array'],
             'categories.*' => ['integer', Rule::exists('categories', 'id')],
             'new_categories' => ['nullable', 'string', 'max:500'],
@@ -58,7 +64,9 @@ abstract class BookRequest extends FormRequest
             'title' => 'título', 'subtitle' => 'subtítulo', 'authors' => 'autores', 'publisher' => 'editora',
             'isbn' => 'ISBN', 'edition' => 'edição', 'publication_year' => 'ano de publicação',
             'pages' => 'páginas', 'description' => 'descrição', 'cover_url' => 'URL da capa',
-            'language' => 'idioma', 'format' => 'formato', 'collection_id' => 'coleção',
+            'language' => 'idioma', 'format' => 'formato', 'collection_group' => 'grupo do acervo',
+            'material_type' => 'tipo de material', 'audience' => 'público',
+            'education_stage' => 'etapa de ensino', 'work_id' => 'obra', 'collection_id' => 'coleção',
         ];
     }
 

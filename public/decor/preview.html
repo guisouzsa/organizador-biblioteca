@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prévia dos efeitos — Biblioteca Escolar</title>
+<link rel="stylesheet" href="efeitos.css">
+<style>
+ body{font:16px/1.5 system-ui,sans-serif;margin:0;padding:2rem 1rem;background:#c4c4c4;color:#808080}
+ main{max-width:56rem;margin:auto} h1{margin-top:0} h2{font-size:1rem;margin:2.5rem 0 .75rem}
+ .card{background:#c4c4c4;border:1px solid #808080;border-radius:8px;padding:1rem;display:block;color:inherit;text-decoration:none}
+ .grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr))}
+ .area{padding:2rem;border:1px solid #919191;border-radius:8px}
+ code{background:#b3b3b3;padding:.1rem .35rem;border-radius:4px}
+</style></head>
+<body><main>
+<h1>Efeitos gato-livro</h1>
+<p>Passe o mouse e use <kbd>Tab</kbd> para ver os efeitos de foco. Com “reduzir movimento” ativo no sistema, as animações param.</p>
+
+<h2>1. Divisor com patinha — <code>.divisor-patas</code></h2>
+<hr class="divisor-patas">
+
+<h2>2. Card com patinha — <code>.efeito-patinha</code></h2>
+<div class="grid">
+ <a href="#" class="card efeito-patinha"><strong>Livros</strong><br>128 títulos</a>
+ <a href="#" class="card efeito-patinha"><strong>Leitores ativos</strong><br>342 pessoas</a>
+</div>
+
+<h2>3. Link ondulado — <code>.link-ondulado</code></h2>
+<p>Veja o <a href="#" class="link-ondulado">catálogo completo</a> de livros.</p>
+
+<h2>4. Gatinho espiando — <code>.espia</code></h2>
+<div class="espia card"><img class="espia__gato" src="gato-espiando.svg" alt="" aria-hidden="true"><strong>Prontas para retirada</strong><br>Nenhuma reserva aguardando.</div>
+
+<h2>5. Marcador de página — <code>.marca-pagina</code></h2>
+<div class="marca-pagina card" style="margin-top:.75rem"><strong>Livro do mês</strong><br>Um enfeite no canto do card.</div>
+
+<h2>6. Carregando — <code>.carregando</code></h2>
+<span class="carregando" role="status"><span class="carregando__meio"></span><span class="somente-leitor">Carregando…</span></span>
+
+<h2>7. Fundo de patinhas — <code>.fundo-patas</code></h2>
+<div class="area fundo-patas">Área vazia (login, estado vazio).</div>
+
+<h2>8. Estado vazio + enfeites — <code>.balanca</code></h2>
+<div class="area fundo-patas" style="text-align:center">
+ <img src="gato-dormindo.svg" alt="" aria-hidden="true" width="180"><p><strong>A biblioteca ainda está vazia</strong><br>Cadastre o primeiro livro.</p>
+ <img class="balanca" src="lapis-gato.svg" alt="" aria-hidden="true" width="90">
+</div>
+</main></body></html>

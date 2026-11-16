@@ -1,108 +1,108 @@
-@import '@fontsource-variable/fraunces/index.css';
-@import '@fontsource-variable/inter/index.css';
+@import '@fontsource-variable/ibm-plex-sans/index.css';
 @import 'tailwindcss';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-/*
- * DESIGN SYSTEM — "Ficha catalográfica"
- * Papel quente + grafite + musgo. Todas as telas herdam daqui:
- * as escalas `slate`, `indigo`, `rose`, `amber`, `emerald` e `sky` do Tailwind foram
- * redefinidas com a paleta da casa, então nenhuma tela depende de cores "de fábrica".
- *
- *   slate   → neutros quentes (papel, linhas, grafite)
- *   indigo  → ação primária (musgo)
- *   rose    → erro / atraso (tijolo)
- *   amber   → atenção (ocre)
- *   emerald → disponível / sucesso (sálvia)
- *   sky     → informação (azul-ardósia)
- *   accent  → terracota, usado com parcimônia
- */
+/* Paleta monocromática com contraste: somente branco, preto e tons de cinza. */
 @theme {
-    /* Tipografia: serifada editorial nos títulos, sans nos controles e dados */
-    --font-sans: 'Inter Variable', ui-sans-serif, system-ui, 'Segoe UI', sans-serif;
-    --font-serif: 'Fraunces Variable', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+    /* Tipografia: IBM Plex Sans em toda a interface (robusta, humanista, ótima em corpo pequeno e em títulos).
+       Escolhida sobre Inter (muito neutro), DM Sans (levemente infantil) e Geist (muito técnico).
+       IBM Plex Sans tem personalidade editorial adequada para um sistema de biblioteca.
+       Pesos realmente usados: 400, 500, 600. */
+    --font-sans: 'IBM Plex Sans Variable', 'IBM Plex Sans', ui-sans-serif, system-ui, 'Segoe UI', sans-serif;
+    --font-display: var(--font-sans);
     --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
 
-    /* Raios discretos */
-    --radius-sm: 2px;
-    --radius-md: 4px;
-    --radius-lg: 6px;
-    --radius-xl: 8px;
-    --radius-2xl: 10px;
+    /* Raios: suaves, com hierarquia (campos/botões < cartões < menus < modais). Nada de pílulas. */
+    --radius-sm: 6px;   /* selos, imagens, badges */
+    --radius-md: 10px;  /* campos e botões */
+    --radius-lg: 14px;  /* cartões e painéis */
+    --radius-xl: 18px;  /* menus suspensos, blocos grandes */
+    --radius-2xl: 24px; /* modais */
 
-    /* Sombras quase imperceptíveis: hierarquia vem de linhas, não de sombra */
-    --shadow-sm: 0 1px 0 rgb(37 41 35 / 0.04);
-    --shadow-md: 0 2px 8px rgb(37 41 35 / 0.08);
-    --shadow-lg: 0 8px 24px rgb(37 41 35 / 0.12);
+    --shadow-sm: 0 1px 0 rgb(38 38 38 / 0.04);
+    --shadow-md: 0 2px 8px rgb(38 38 38 / 0.08);
+    --shadow-lg: 0 8px 24px rgb(38 38 38 / 0.12);
+    --shadow-xl: 0 12px 32px rgb(38 38 38 / 0.14);
+    --shadow-2xl: 0 16px 40px rgb(38 38 38 / 0.16);
 
-    --color-white: #fcfbf8;
-    --color-black: #1a1d18;
+    --color-white: #ffffff;
+    --color-black: #171717;
 
-    --color-paper: #f4f1ea;
-    --color-accent: #a66e50;
-    --color-accent-soft: #f0e3da;
+    /* Cinzas de apoio (referência do projeto). Uso: bordas de campos (1), divisores (5/4),
+       ícones e formas decorativas (3/2). NUNCA como texto sobre fundo claro (contraste insuficiente). */
+    --color-cinza-1: var(--cinza-1, #808080);
+    --color-cinza-2: var(--cinza-2, #919191);
+    --color-cinza-3: var(--cinza-3, #a2a2a2);
+    --color-cinza-4: var(--cinza-4, #b3b3b3);
+    --color-cinza-5: var(--cinza-5, #c4c4c4);
 
-    --color-slate-50: #f8f6f1;
-    --color-slate-100: #efebe2;
-    --color-slate-200: #e6e0d5;
-    --color-slate-300: #d3ccbe;
-    --color-slate-400: #a29d90;
-    --color-slate-500: #686c60;
-    --color-slate-600: #51554b;
-    --color-slate-700: #3b3f37;
-    --color-slate-800: #2e322b;
-    --color-slate-900: #252923;
-    --color-slate-950: #191c17;
+    --color-paper: #f5f5f5;
+    --color-accent: #525252;
+    --color-accent-soft: #e5e5e5;
 
-    --color-indigo-50: #eceee5;
-    --color-indigo-100: #dfe3d3;
-    --color-indigo-200: #c6ceb3;
-    --color-indigo-300: #a6b08f;
-    --color-indigo-400: #87936f;
-    --color-indigo-500: #5c694d;
-    --color-indigo-600: #4a5640;
-    --color-indigo-700: #3a4532;
-    --color-indigo-800: #2d3627;
+    --color-slate-50: #fafafa;
+    --color-slate-100: #f5f5f5;
+    --color-slate-200: #e5e5e5;
+    --color-slate-300: #d4d4d4;
+    --color-slate-400: #a3a3a3;
+    --color-slate-500: #737373;
+    --color-slate-600: #525252;
+    --color-slate-700: #404040;
+    --color-slate-800: #262626;
+    --color-slate-900: #171717;
+    --color-slate-950: #0a0a0a;
 
-    --color-rose-50: #f8ede9;
-    --color-rose-200: #e5c4b9;
-    --color-rose-300: #d6a798;
-    --color-rose-400: #c0846f;
-    --color-rose-500: #a9604b;
-    --color-rose-600: #9a4a36;
-    --color-rose-700: #823c2b;
-    --color-rose-800: #6a3225;
+    --color-indigo-50: #fafafa;
+    --color-indigo-100: #f5f5f5;
+    --color-indigo-200: #e5e5e5;
+    --color-indigo-300: #d4d4d4;
+    --color-indigo-400: #a3a3a3;
+    --color-indigo-500: #737373;
+    --color-indigo-600: #525252;
+    --color-indigo-700: #404040;
+    --color-indigo-800: #262626;
 
-    --color-amber-50: #f6efdc;
-    --color-amber-100: #eee2bd;
-    --color-amber-200: #e2d095;
-    --color-amber-300: #d0b96a;
-    --color-amber-600: #8a6a1e;
-    --color-amber-700: #735818;
-    --color-amber-800: #5f4814;
-    --color-amber-900: #4c3a10;
+    --color-rose-50: #fafafa;
+    --color-rose-200: #e5e5e5;
+    --color-rose-300: #d4d4d4;
+    --color-rose-400: #a3a3a3;
+    --color-rose-500: #737373;
+    --color-rose-600: #525252;
+    --color-rose-700: #404040;
+    --color-rose-800: #262626;
 
-    --color-emerald-50: #e9f0e5;
-    --color-emerald-200: #c4d5ba;
-    --color-emerald-300: #a3bb97;
-    --color-emerald-500: #5b7a52;
-    --color-emerald-600: #46663e;
-    --color-emerald-700: #3a5533;
-    --color-emerald-800: #2f4528;
-    --color-emerald-900: #25361f;
+    --color-amber-50: #fafafa;
+    --color-amber-100: #f5f5f5;
+    --color-amber-200: #e5e5e5;
+    --color-amber-300: #d4d4d4;
+    --color-amber-600: #525252;
+    --color-amber-700: #404040;
+    --color-amber-800: #262626;
+    --color-amber-900: #171717;
 
-    --color-sky-50: #e8eef1;
-    --color-sky-200: #c3d1d9;
-    --color-sky-600: #4a6777;
-    --color-sky-700: #3c5462;
-    --color-sky-900: #26363f;
+    --color-emerald-50: #fafafa;
+    --color-emerald-200: #e5e5e5;
+    --color-emerald-300: #d4d4d4;
+    --color-emerald-500: #737373;
+    --color-emerald-600: #525252;
+    --color-emerald-700: #404040;
+    --color-emerald-800: #262626;
+    --color-emerald-900: #171717;
+
+    --color-sky-50: #fafafa;
+    --color-sky-200: #e5e5e5;
+    --color-sky-600: #525252;
+    --color-sky-700: #404040;
+    --color-sky-900: #171717;
 }
 
 @layer base {
+    *, *::before, *::after, ::backdrop {
+        --tw-ring-offset-color: var(--color-white);
+    }
+
     html {
         -webkit-text-size-adjust: 100%;
         scroll-padding-top: 4.5rem;
@@ -111,20 +111,18 @@
     body {
         background-color: var(--color-paper);
         color: var(--color-slate-900);
-        font-feature-settings: 'cv11', 'ss01', 'tnum';
+        font-feature-settings: 'tnum';
     }
 
-    /* Hierarquia editorial: títulos serifados, tudo o mais em sans */
+    /* Títulos em sans-serif: sem serifas em toda a interface */
     h1,
     h2 {
-        font-family: var(--font-serif);
-        font-optical-sizing: auto;
-        font-variation-settings: 'SOFT' 0;
-        letter-spacing: -0.01em;
+        font-family: var(--font-display);
+        letter-spacing: -0.018em;
         text-wrap: balance;
     }
-    h1 { font-weight: 500; }
-    h2 { font-weight: 500; }
+    h1 { font-weight: 600; }
+    h2 { font-weight: 600; }
 
     ::selection { background: var(--color-accent-soft); }
 
@@ -132,8 +130,10 @@
     :focus-visible {
         outline: 2px solid var(--color-indigo-600);
         outline-offset: 2px;
-        border-radius: 2px;
     }
+
+    /* Menus nativos (selects, datalist, calendário) sempre claros, mesmo com o sistema em modo escuro */
+    :root { color-scheme: light; }
 
     /* Mobile: 16px evita o zoom automático do iOS; alvos de toque de 44px */
     @media (max-width: 767px) {
@@ -172,6 +172,15 @@
 }
 
 @layer components {
+    .catalog-scope__item {
+        display: flex; min-height: 2.75rem; align-items: center; justify-content: center; gap: 0.4rem;
+        border-radius: 0.6rem; padding: 0.5rem 0.75rem; color: var(--color-slate-600);
+        font-size: 0.875rem; font-weight: 600; transition: background-color 140ms, color 140ms, box-shadow 140ms;
+    }
+    .catalog-scope__item:hover { color: var(--color-slate-900); background: var(--color-cinza-5); }
+    .catalog-scope__item.is-active { background: var(--color-white); color: var(--color-indigo-800); box-shadow: var(--shadow-sm); }
+    .book-field--contextual { border-radius: var(--radius-lg); background: var(--color-sky-50); padding: 0.75rem; box-shadow: inset 0 0 0 1px var(--color-sky-200); }
+
     /* ---------- Botões ---------- */
     .btn {
         display: inline-flex;
@@ -193,7 +202,7 @@
     .btn-primary { background: var(--color-indigo-600); color: #fff; }
     .btn-primary:hover:not(:disabled) { background: var(--color-indigo-700); }
     .btn-primary:active:not(:disabled) { background: var(--color-indigo-800); }
-    .btn-secondary { color: var(--color-slate-800); box-shadow: inset 0 0 0 1px var(--color-slate-400); background: transparent; }
+    .btn-secondary { color: var(--color-slate-800); box-shadow: inset 0 0 0 1px var(--color-cinza-1); background: transparent; }
     .btn-secondary:hover:not(:disabled) { background: var(--color-slate-100); }
     .btn-quiet { color: var(--color-indigo-700); padding-inline: 0.5rem; }
     .btn-quiet:hover { background: var(--color-indigo-50); }
@@ -212,10 +221,11 @@
         background: var(--color-white);
         padding: 0.55rem 0.75rem;
         font-size: 0.875rem;
-        box-shadow: inset 0 0 0 1px var(--color-slate-400);
+        box-shadow: inset 0 0 0 1px var(--color-cinza-1);
         transition: box-shadow 120ms;
     }
-    .field:hover { box-shadow: inset 0 0 0 1px var(--color-slate-500); }
+    .field:hover:not(:disabled) { box-shadow: inset 0 0 0 1px var(--color-slate-600); }
+    .field:disabled { background: var(--color-slate-100); color: var(--color-slate-500); box-shadow: inset 0 0 0 1px var(--color-cinza-4); cursor: not-allowed; }
     .field:focus { outline: none; box-shadow: inset 0 0 0 2px var(--color-indigo-600); }
     .field::placeholder { color: var(--color-slate-400); }
     .field[aria-invalid='true'] { box-shadow: inset 0 0 0 2px var(--color-rose-500); }
@@ -223,7 +233,7 @@
     /* ---------- Superfícies ---------- */
     .panel {
         background: var(--color-white);
-        border: 1px solid var(--color-slate-200);
+        border: 1px solid var(--color-cinza-5);
         border-radius: var(--radius-lg);
     }
 
@@ -249,12 +259,16 @@
         aspect-ratio: 2 / 3;
         object-fit: cover;
         background: var(--color-slate-200);
-        border-radius: 2px;
-        box-shadow: 0 1px 2px rgb(37 41 35 / 0.18), 0 0 0 1px rgb(37 41 35 / 0.06);
+        border-radius: var(--radius-sm);
+        box-shadow: 0 1px 2px var(--color-cinza-1), 0 0 0 1px var(--color-cinza-2);
     }
 
+    /* Logo (PNG com fundo transparente): recorta só a margem vazia, sem mexer no arquivo.
+       Cinza escuro sobre superfícies claras: nunca colocar sobre fundo escuro, ou os vazados (olhos/bigodes) somem. */
+    .logo-mark { aspect-ratio: 6 / 5; object-fit: cover; user-select: none; }
+
     /* Divisor fino com número, usado em listas editoriais */
-    .rule { border-top: 1px solid var(--color-slate-300); }
+    .rule { border-top: 1px solid var(--color-cinza-5); }
 
     /* ---------- Tabelas: viram listas de fichas no celular ---------- */
     main table { width: 100%; }
@@ -311,4 +325,168 @@
     #sidebar, header[data-app-header], nav[data-bottom-nav], [data-sidebar-backdrop] { display: none !important; }
     body { background: #fff; }
     .lg\:pl-64 { padding-left: 0 !important; }
+}
+
+/* =====================================================================
+   Feedback e modais — uma linguagem para todo o sistema
+   ===================================================================== */
+@layer components {
+    html.modal-open { overflow: hidden; }
+
+    dialog.modal {
+        margin: auto;
+        padding: 0;
+        width: min(28rem, calc(100vw - 2rem));
+        max-height: min(40rem, calc(100dvh - 2rem));
+        border: 1px solid var(--color-cinza-5);
+        border-radius: var(--radius-2xl);
+        background: var(--color-white);
+        color: var(--color-slate-900);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+    }
+    dialog.modal[open] {
+        display: flex;
+        flex-direction: column;
+        animation: modal-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    dialog.modal::backdrop {
+        background: rgb(23 23 23 / 0.48);
+        animation: modal-fade 180ms ease-out;
+    }
+    @keyframes modal-in { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: none; } }
+    @keyframes modal-fade { from { opacity: 0; } to { opacity: 1; } }
+
+    .modal__head { display: flex; align-items: center; gap: 0.875rem; padding: 1.25rem 1.5rem 0.25rem; }
+    .modal__title { font-size: 1.125rem; line-height: 1.3; }
+    .modal__body { padding: 0.5rem 1.5rem 1.25rem; overflow-y: auto; flex: 1 1 auto; overscroll-behavior: contain; }
+    .modal__message { font-size: 0.9375rem; line-height: 1.55; color: var(--color-slate-700); overflow-wrap: anywhere; }
+    .modal__detail { margin-top: 0.75rem; padding: 0.625rem 0.75rem; border-radius: var(--radius-md); background: var(--color-slate-100); font-size: 0.8125rem; color: var(--color-slate-700); }
+    .modal__foot {
+        display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.5rem;
+        padding: 0.875rem 1.5rem 1.25rem; border-top: 1px solid var(--color-slate-200); background: var(--color-slate-50);
+    }
+
+    .modal__icon {
+        display: grid; place-items: center; flex: none; width: 2.5rem; height: 2.5rem;
+        border-radius: 12px; background: var(--color-slate-100); color: var(--color-slate-700);
+    }
+    dialog[data-tone='success'] .modal__icon, .modal__icon[data-tone='success'] { background: var(--color-emerald-50); color: var(--color-emerald-700); }
+    dialog[data-tone='info'] .modal__icon, .modal__icon[data-tone='info'] { background: var(--color-sky-50); color: var(--color-sky-700); }
+    dialog[data-tone='warning'] .modal__icon, .modal__icon[data-tone='warning'] { background: var(--color-amber-50); color: var(--color-amber-800); }
+    dialog[data-tone='error'] .modal__icon, .modal__icon[data-tone='error'] { background: var(--color-rose-50); color: var(--color-rose-700); }
+    dialog[data-tone='denied'] .modal__icon, .modal__icon[data-tone='denied'] { background: var(--color-slate-200); color: var(--color-slate-800); }
+    dialog[data-tone='confirm'] .modal__icon { background: var(--color-indigo-50); color: var(--color-indigo-700); }
+
+    .btn-danger-solid { background: var(--color-rose-700); color: #fff; }
+    .btn-danger-solid:hover { background: var(--color-rose-800); }
+
+    /* Celular: o modal ocupa a largura útil, respeita a área segura e os botões empilham (principal em cima) */
+    @media (max-width: 639px) {
+        dialog.modal {
+            width: calc(100vw - 1.5rem);
+            max-height: calc(100dvh - 1.5rem - env(safe-area-inset-bottom) - env(safe-area-inset-top));
+            margin: auto auto calc(0.75rem + env(safe-area-inset-bottom));
+        }
+        .modal__head { padding: 1.125rem 1.125rem 0.25rem; }
+        .modal__body { padding: 0.5rem 1.125rem 1rem; }
+        .modal__foot { flex-direction: column-reverse; padding: 0.75rem 1.125rem 1rem; }
+        .modal__foot .btn { width: 100%; min-height: 2.875rem; }
+    }
+
+    /* ---------- Alerta persistente ---------- */
+    .alert {
+        display: flex; gap: 0.75rem; align-items: flex-start;
+        padding: 0.75rem 1rem; border-radius: var(--radius-lg); border: 1px solid; font-size: 0.875rem; line-height: 1.5;
+    }
+    .alert__icon { flex: none; width: 1.125rem; height: 1.125rem; margin-top: 0.15rem; }
+    .alert--info { background: var(--color-sky-50); border-color: var(--color-sky-200); color: var(--color-sky-900); }
+    .alert--success { background: var(--color-emerald-50); border-color: var(--color-emerald-200); color: var(--color-emerald-900); }
+    .alert--warning { background: var(--color-amber-50); border-color: var(--color-amber-200); color: var(--color-amber-900); }
+    .alert--error { background: var(--color-rose-50); border-color: var(--color-rose-200); color: var(--color-rose-800); }
+    .alert--denied { background: var(--color-slate-100); border-color: var(--color-cinza-4); color: var(--color-slate-800); }
+
+    /* ---------- Toast ---------- */
+    .toast {
+        pointer-events: auto; display: flex; align-items: center; gap: 0.75rem; max-width: min(26rem, 100%);
+        padding: 0.625rem 0.75rem 0.625rem 1rem; border-radius: var(--radius-lg);
+        background: var(--color-slate-900); color: #fff; font-size: 0.875rem; box-shadow: var(--shadow-md);
+        animation: modal-in 180ms ease-out;
+    }
+    .toast--error { background: var(--color-rose-700); }
+    .toast__close { flex: none; width: 1.75rem; height: 1.75rem; border-radius: var(--radius-sm); font-size: 1.25rem; line-height: 1; color: inherit; opacity: 0.8; }
+    .toast__close:hover { opacity: 1; background: var(--color-cinza-2); }
+
+    /* ---------- Campo de seleção — nativo estilizado (todos os dispositivos) ---------- */
+    select.field {
+        appearance: none;
+        padding-right: 2.25rem;
+        /* Chevron SVG inline: cinza institucional #808080 codificado como %23 */
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23808080' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1rem;
+        /* Garante fundo claro mesmo em dark-mode do SO (color-scheme: light já cobre, mas reforça) */
+        background-color: var(--color-white);
+        color: var(--color-slate-900);
+    }
+    select.field:hover:not(:disabled) { box-shadow: inset 0 0 0 1px var(--color-slate-600); }
+    select.field option { background: var(--color-white); color: var(--color-slate-900); }
+
+    /* ---------- Campo de seleção — componente personalizado (desktop com mouse) ---------- */
+    .ui-select { position: relative; }
+    .ui-select__native { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+    .ui-select__btn {
+        display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; text-align: left; cursor: pointer; min-height: 2.5rem;
+    }
+    .ui-select__btn[aria-expanded='true'] { box-shadow: inset 0 0 0 2px var(--color-indigo-600); }
+    .ui-select__btn:disabled { cursor: not-allowed; }
+    .ui-select__value { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ui-select__value.is-placeholder { color: var(--color-slate-500); }
+    .ui-select__chevron { flex: none; width: 1rem; height: 1rem; color: var(--color-slate-600); transition: transform 140ms; }
+    .ui-select__btn[aria-expanded='true'] .ui-select__chevron { transform: rotate(180deg); }
+
+    .ui-select__popup {
+        position: fixed; z-index: 80; display: flex; flex-direction: column; padding: 6px;
+        background: var(--color-white); border: 1px solid var(--color-cinza-4); border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-lg); animation: modal-in 120ms ease-out;
+    }
+    .ui-select__popup[hidden] { display: none; }
+    .ui-select__search {
+        width: 100%; margin-bottom: 6px; padding: 0.5rem 0.75rem; font-size: 0.875rem; border: 0; border-radius: var(--radius-md);
+        background: var(--color-slate-100); box-shadow: inset 0 0 0 1px var(--color-cinza-4);
+    }
+    .ui-select__search[hidden] { display: none; }
+    .ui-select__search:focus { outline: none; box-shadow: inset 0 0 0 2px var(--color-indigo-600); }
+    .ui-select__list { overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 2px; }
+    .ui-select__list [role='option'] {
+        display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; cursor: pointer;
+        padding: 0.5rem 0.75rem; border-radius: var(--radius-md); font-size: 0.875rem; line-height: 1.35;
+    }
+    .ui-select__list [role='option'][hidden] { display: none; }
+    .ui-select__list [role='option'].is-active { background: var(--color-slate-100); }
+    .ui-select__list [role='option'].is-placeholder { color: var(--color-slate-500); }
+    .ui-select__list [role='option'][aria-selected='true'] { background: var(--color-indigo-50); color: var(--color-indigo-800); font-weight: 600; }
+    .ui-select__list [role='option'][aria-disabled='true'] { opacity: 0.45; cursor: not-allowed; }
+    .ui-select__check { flex: none; width: 1rem; height: 1rem; opacity: 0; }
+    .ui-select__list [role='option'][aria-selected='true'] .ui-select__check { opacity: 1; }
+    .ui-select__empty { padding: 0.75rem; font-size: 0.8125rem; color: var(--color-slate-600); text-align: center; }
+
+    /* ---------- Capa: estado alternativo quando não há imagem ---------- */
+    .cover--empty {
+        display: grid; place-items: center; text-align: center; padding: 0.5rem;
+        background: var(--color-slate-100);
+        box-shadow: inset 0 0 0 1px var(--color-cinza-4);
+    }
+    .cover__label { font-size: 0.6875rem; font-weight: 500; line-height: 1.3; color: var(--color-slate-600); }
+
+    /* ---------- Scanner: estado de pesquisa usa a barra de status com ícone de carregamento ---------- */
+    .scanner-status[data-state='searching'] #scanner-loading {
+        display: flex;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        dialog.modal[open], dialog.modal::backdrop, .toast, .ui-select__popup { animation: none; }
+    }
+    @media print { dialog.modal, #toast-region { display: none !important; } }
 }

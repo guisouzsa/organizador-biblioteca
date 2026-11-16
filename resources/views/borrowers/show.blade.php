@@ -71,7 +71,7 @@
             @can('changeStatus', $borrower)
                 <section class="panel p-5">
                     <h2 class="font-semibold">Situação do leitor</h2>
-                    <form method="POST" action="{{ route('borrowers.status', $borrower) }}" class="mt-3 space-y-3" data-once onsubmit="return confirm('Alterar a situação deste leitor? O histórico será preservado.')">
+                    <form method="POST" action="{{ route('borrowers.status', $borrower) }}" class="mt-3 space-y-3" data-once data-confirm="A situação de {{ $borrower->name }} será alterada. O histórico de empréstimos é preservado e as reservas ativas podem ser canceladas." data-confirm-title="Alterar a situação do leitor?" data-confirm-label="Alterar situação">
                         @csrf
                         <select name="status" aria-label="Nova situação" class="field">
                             @foreach (\App\Enums\BorrowerStatus::cases() as $s)<option value="{{ $s->value }}" @selected($borrower->status === $s)>{{ $s->label() }}</option>@endforeach
@@ -87,7 +87,7 @@
                 <section class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-rose-200">
                     <h2 class="font-semibold text-rose-800">Remover dados pessoais (LGPD)</h2>
                     <p class="mt-1 text-xs text-slate-600">Apaga nome, matrícula e contatos, mantendo o histórico de forma anônima. <strong>Irreversível.</strong></p>
-                    <form method="POST" action="{{ route('borrowers.anonymize', $borrower) }}" class="mt-3" data-once onsubmit="return confirm('Remover definitivamente os dados pessoais deste leitor? Esta ação não pode ser desfeita.')">
+                    <form method="POST" action="{{ route('borrowers.anonymize', $borrower) }}" class="mt-3" data-once data-confirm="Os dados pessoais de {{ $borrower->name }} serão removidos definitivamente. O histórico de empréstimos continua, sem identificar a pessoa." data-confirm-title="Remover dados pessoais?" data-confirm-label="Remover dados" data-confirm-danger">
                         @csrf<button class="btn btn-danger">Anonimizar leitor</button>
                     </form>
                 </section>
