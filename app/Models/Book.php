@@ -60,15 +60,15 @@ class Book extends Model
         }
 
         $like = $this->likeOperator();
-        $escaped = '%'.addcslashes($term, '%_\').'%';
+        $escaped = '%'.$term.'%';
         $digits = preg_replace('/[\s\-]/', '', $term);
 
         return $query->where(function (Builder $q) use ($like, $escaped, $digits) {
             $q->where('title', $like, $escaped)
                 ->orWhere('subtitle', $like, $escaped)
                 ->orWhere('authors', $like, $escaped)
-                ->orWhere('isbn13', $like, '%'.addcslashes($digits, '%_\').'%')
-                ->orWhere('isbn10', $like, '%'.addcslashes(strtoupper($digits), '%_\').'%');
+                ->orWhere('isbn13', $like, '%'.$digits.'%')
+                ->orWhere('isbn10', $like, '%'.strtoupper($digits).'%');
         });
     }
 
