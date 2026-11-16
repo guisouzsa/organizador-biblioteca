@@ -18,8 +18,8 @@
 @section('content')
     <div class="no-print">
         <x-shared.page-header title="Etiquetas" subtitle="Imprima e cole no exemplar. O código também aparece escrito abaixo das barras.">
-            <button type="button" data-print class="rounded-md bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Imprimir etiquetas</button>
-            <a href="{{ route('copies.index') }}" class="rounded-md px-4 py-2.5 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100">Ir ao acervo</a>
+            <button type="button" data-print class="btn btn-primary">Imprimir etiquetas</button>
+            <a href="{{ route('copies.index') }}" class="btn btn-secondary">Ir ao acervo</a>
         </x-shared.page-header>
     </div>
 
@@ -28,7 +28,7 @@
     @else
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ($copies as $copy)
-                <div class="label-card rounded-lg bg-white p-4 text-center shadow-sm ring-1 ring-slate-200">
+                <div class="panel label-card p-4 text-center">
                     <p class="truncate text-sm font-semibold">{{ \Illuminate\Support\Str::limit($copy->book->title, 42) }}</p>
                     <svg data-barcode="{{ $copy->code() }}" class="mx-auto mt-2 max-w-full" role="img" aria-label="Código de barras {{ $copy->code() }}"></svg>
                     <p class="mt-1 text-xs text-slate-600">

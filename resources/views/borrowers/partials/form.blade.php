@@ -20,7 +20,7 @@
     </div>
 
     <div class="flex gap-3 border-t border-slate-200 pt-5">
-        <button type="submit" class="rounded-md bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">{{ $submitLabel }}</button>
-        <a href="{{ $borrower ? route('borrowers.show', $borrower) : route('borrowers.index') }}" class="rounded-md px-4 py-2.5 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100">Cancelar</a>
+        <button type="submit" class="btn btn-primary">{{ $submitLabel }}</button>
+        <a href="{{ $borrower ? route('borrowers.show', $borrower) : route('borrowers.index') }}" class="btn btn-secondary">Cancelar</a>
     </div>
 </form>

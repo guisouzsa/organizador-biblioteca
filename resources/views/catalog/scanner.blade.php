@@ -8,7 +8,7 @@
 
 @section('content')
     <div class="max-w-3xl" id="scanner-app" data-lookup-url="{{ route('books.lookup') }}">
-        <h1 class="text-2xl font-semibold tracking-tight">Escanear livro</h1>
+        <h1 class="text-2xl">Escanear livro</h1>
         <p class="mt-1 text-sm text-slate-600">Aponte a câmera para o código de barras do verso do livro (ISBN). Se preferir, digite o número abaixo.</p>
 
         <div id="scanner-status" role="status" aria-live="polite" data-state="idle"
@@ -25,23 +25,23 @@
         </div>
 
         <div class="mt-4 flex flex-wrap items-end gap-3">
-            <button type="button" id="scanner-toggle" class="rounded-md bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+            <button type="button" id="scanner-toggle" class="btn btn-primary">
                 Iniciar câmera
             </button>
             <div class="min-w-48 flex-1 sm:flex-none">
                 <label for="scanner-device" class="block text-xs font-medium text-slate-600">Câmera</label>
-                <select id="scanner-device" disabled class="mt-1 block w-full rounded-md border-0 bg-white px-3 py-2 text-sm shadow-sm ring-1 ring-inset ring-slate-300 disabled:opacity-60">
+                <select id="scanner-device" disabled class="btn btn-secondary mt-1 w-full">
                     <option value="">Automática (traseira)</option>
                 </select>
             </div>
         </div>
 
-        <form id="manual-isbn-form" class="mt-6 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200" novalidate>
+        <form id="manual-isbn-form" class="panel mt-6 p-4" novalidate>
             <label for="manual-isbn" class="block text-sm font-medium text-slate-700">Digitar ISBN manualmente</label>
             <div class="mt-1 flex gap-2">
                 <input id="manual-isbn" name="isbn" type="text" inputmode="text" autocomplete="off" placeholder="978-85-..." maxlength="40"
-                       class="block w-full rounded-md border-0 bg-white px-3 py-2 text-sm shadow-sm ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600">
-                <button type="submit" class="shrink-0 rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">Pesquisar</button>
+                       class="field">
+                <button type="submit" class="btn btn-primary shrink-0">Pesquisar</button>
             </div>
             <p class="mt-1 text-xs text-slate-500">Aceita ISBN-13 e ISBN-10, com ou sem hifens.</p>
         </form>

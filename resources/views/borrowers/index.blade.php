@@ -3,17 +3,17 @@
 @section('title', 'Leitores — '.config('app.name'))
 
 @php
-    $input = 'mt-1 block w-full rounded-md border-0 bg-white px-3 py-2 text-sm shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600';
+    $input = 'field';
     $hasFilters = collect($filters)->filter()->isNotEmpty();
     $tone = ['active' => 'emerald', 'inactive' => 'slate', 'transferred' => 'amber', 'graduated' => 'sky'];
 @endphp
 
 @section('content')
     <x-shared.page-header title="Leitores" :subtitle="$borrowers->total().' '.($borrowers->total() === 1 ? 'leitor' : 'leitores').($hasFilters ? ' encontrados' : ' cadastrados')">
-        @can('borrower.create')<a href="{{ route('borrowers.create') }}" class="rounded-md bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Cadastrar leitor</a>@endcan
+        @can('borrower.create')<a href="{{ route('borrowers.create') }}" class="btn btn-primary">Cadastrar leitor</a>@endcan
     </x-shared.page-header>
 
-    <form method="GET" action="{{ route('borrowers.index') }}" class="grid gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:grid-cols-2 lg:grid-cols-5">
+    <form method="GET" action="{{ route('borrowers.index') }}" class="panel grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-5">
         <div class="sm:col-span-2">
             <label for="q" class="block text-sm font-medium text-slate-700">Buscar</label>
             <input id="q" name="q" type="search" value="{{ $filters['q'] ?? '' }}" placeholder="Nome, matrícula ou turma" class="{{ $input }}">
@@ -34,8 +34,8 @@
             <label class="flex items-center gap-2 pb-2 text-sm text-slate-600"><input type="checkbox" name="atraso" value="1" @checked($filters['atraso'] ?? false) class="rounded border-slate-300 text-indigo-600"> Com atraso</label>
         </div>
         <div class="flex gap-2 sm:col-span-2 lg:col-span-5">
-            <button class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">Filtrar</button>
-            @if ($hasFilters)<a href="{{ route('borrowers.index') }}" class="rounded-md px-4 py-2 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100">Limpar filtros</a>@endif
+            <button class="btn btn-primary">Filtrar</button>
+            @if ($hasFilters)<a href="{{ route('borrowers.index') }}" class="btn btn-secondary">Limpar filtros</a>@endif
         </div>
     </form>
 
@@ -45,12 +45,12 @@
                 <x-shared.empty-state title="Nenhum leitor encontrado." text="Confira a matrícula ou tente outro termo." icon="users" />
             @else
                 <x-shared.empty-state title="Nenhum leitor cadastrado." text="Cadastre os leitores (alunos e servidores) para registrar empréstimos." icon="users">
-                    @can('borrower.create')<a href="{{ route('borrowers.create') }}" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">Cadastrar leitor</a>@endcan
+                    @can('borrower.create')<a href="{{ route('borrowers.create') }}" class="btn btn-primary">Cadastrar leitor</a>@endcan
                 </x-shared.empty-state>
             @endif
         </div>
     @else
-        <div class="mt-6 overflow-x-auto rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+        <div class="panel mt-6 overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200 text-sm">
                 <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr><th class="px-4 py-3">Nome</th><th class="px-4 py-3">Matrícula</th><th class="px-4 py-3">Tipo</th><th class="px-4 py-3">Turma</th><th class="px-4 py-3">Situação</th><th class="px-4 py-3">Empréstimos</th></tr></thead>
                 <tbody class="divide-y divide-slate-100">

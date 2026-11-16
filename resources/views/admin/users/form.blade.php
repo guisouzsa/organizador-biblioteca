@@ -6,7 +6,7 @@
     <div class="max-w-xl">
         <x-shared.page-header :title="$user ? 'Editar usuário' : 'Novo usuário'" :subtitle="$user?->email" />
 
-        <form method="POST" action="{{ $user ? route('users.update', $user) : route('users.store') }}" class="space-y-4 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200" novalidate data-once>
+        <form method="POST" action="{{ $user ? route('users.update', $user) : route('users.store') }}" class="panel space-y-4 p-6" novalidate data-once>
             @csrf
             @if ($user) @method('PUT') @endif
             @if ($errors->any())<div role="alert" class="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">Corrija os campos destacados.</div>@endif
@@ -28,8 +28,8 @@
             @endif
 
             <div class="flex gap-3 border-t border-slate-200 pt-5">
-                <button type="submit" class="rounded-md bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500">{{ $user ? 'Salvar' : 'Criar usuário' }}</button>
-                <a href="{{ route('users.index') }}" class="rounded-md px-4 py-2.5 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100">Cancelar</a>
+                <button type="submit" class="btn btn-primary">{{ $user ? 'Salvar' : 'Criar usuário' }}</button>
+                <a href="{{ route('users.index') }}" class="btn btn-secondary">Cancelar</a>
             </div>
         </form>
     </div>

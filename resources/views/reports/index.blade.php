@@ -3,26 +3,26 @@
 @section('title', 'Relatórios — '.config('app.name'))
 
 @php
-    $input = 'mt-1 block w-full rounded-md border-0 bg-white px-3 py-2 text-sm shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600';
+    $input = 'field';
     $usesPeriod = in_array($type, ['mais-emprestados', 'movimentacoes', 'turmas'], true);
 @endphp
 
 @section('content')
     <x-shared.page-header title="Relatórios" subtitle="Todos os dados vêm do banco; nada é estimado.">
         @can('report.export')
-            <a href="{{ route('reports.export', request()->query()) }}" class="rounded-md px-4 py-2.5 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100">Exportar CSV</a>
+            <a href="{{ route('reports.export', request()->query()) }}" class="btn btn-secondary">Exportar CSV</a>
         @endcan
     </x-shared.page-header>
 
     <div class="mb-4 flex flex-wrap gap-1" role="tablist" aria-label="Tipo de relatório">
         @foreach ($types as $key => $label)
             <a href="{{ route('reports.index', ['tipo' => $key]) }}" role="tab" aria-selected="{{ $type === $key ? 'true' : 'false' }}"
-               class="rounded-full px-4 py-1.5 text-sm font-medium {{ $type === $key ? 'bg-indigo-600 text-white' : 'bg-white text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100' }}">{{ $label }}</a>
+               class="rounded-md px-4 py-1.5 text-sm font-medium {{ $type === $key ? 'bg-indigo-600 text-white' : 'bg-white text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100' }}">{{ $label }}</a>
         @endforeach
     </div>
 
     @if ($usesPeriod || $type === 'disponibilidade')
-        <form method="GET" action="{{ route('reports.index') }}" class="mb-4 grid gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:grid-cols-4">
+        <form method="GET" action="{{ route('reports.index') }}" class="panel mb-4 grid gap-3 p-4 sm:grid-cols-4">
             <input type="hidden" name="tipo" value="{{ $type }}">
             @if ($usesPeriod)
                 <div><label for="de" class="block text-sm font-medium text-slate-700">De</label><input id="de" type="date" name="de" value="{{ $filters['de'] ?? '' }}" class="{{ $input }}"></div>
@@ -33,7 +33,7 @@
                         @foreach ($categories as $c)<option value="{{ $c->id }}" @selected(($filters['categoria'] ?? null) == $c->id)>{{ $c->name }}</option>@endforeach
                     </select></div>
             @endif
-            <div class="flex items-end"><button class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">Aplicar</button></div>
+            <div class="flex items-end"><button class="btn btn-primary">Aplicar</button></div>
         </form>
     @endif
 
@@ -44,7 +44,7 @@
     @if (count($report['rows']) === 0)
         <x-shared.empty-state title="Sem dados para este relatório." :text="$usesPeriod ? 'Nenhum registro no período selecionado.' : 'Ainda não há registros correspondentes.'" icon="chart" />
     @else
-        <div class="overflow-x-auto rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+        <div class="panel overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200 text-sm">
                 <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr>@foreach ($report['columns'] as $col)<th class="px-4 py-3">{{ $col }}</th>@endforeach</tr></thead>
                 <tbody class="divide-y divide-slate-100">

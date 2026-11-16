@@ -4,7 +4,7 @@
 
 @section('content')
     <x-shared.page-header title="Usuários do sistema" subtitle="Quem opera a biblioteca. Contas não são excluídas: são desativadas, preservando o histórico.">
-        <a href="{{ route('users.create') }}" class="rounded-md bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Novo usuário</a>
+        <a href="{{ route('users.create') }}" class="btn btn-primary">Novo usuário</a>
     </x-shared.page-header>
 
     @if (session('credentials'))
@@ -18,7 +18,7 @@
         </div>
     @endif
 
-    <div class="overflow-x-auto rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+    <div class="panel overflow-x-auto">
         <table class="min-w-full divide-y divide-slate-200 text-sm">
             <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr><th class="px-4 py-3">Nome</th><th class="px-4 py-3">E-mail</th><th class="px-4 py-3">Perfil</th><th class="px-4 py-3">Situação</th><th class="px-4 py-3">Último acesso</th><th class="px-4 py-3"></th></tr></thead>
             <tbody class="divide-y divide-slate-100">
@@ -30,9 +30,9 @@
                         <td class="px-4 py-3">@if ($u->active)<x-shared.badge tone="emerald">Ativo</x-shared.badge>@else<x-shared.badge>Desativado</x-shared.badge>@endif @if ($u->must_change_password)<x-shared.badge tone="amber">Senha temporária</x-shared.badge>@endif</td>
                         <td class="px-4 py-3">{{ $u->last_login_at?->format('d/m/Y H:i') ?? 'nunca' }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-right">
-                            <a href="{{ route('users.edit', $u) }}" class="rounded-md px-3 py-1.5 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100">Editar</a>
+                            <a href="{{ route('users.edit', $u) }}" class="btn btn-secondary">Editar</a>
                             <form method="POST" action="{{ route('users.reset-password', $u) }}" class="inline" data-once onsubmit="return confirm('Gerar uma nova senha temporária para {{ $u->name }}?')">@csrf
-                                <button class="rounded-md px-3 py-1.5 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100">Redefinir senha</button></form>
+                                <button class="btn btn-secondary">Redefinir senha</button></form>
                         </td>
                     </tr>
                 @endforeach

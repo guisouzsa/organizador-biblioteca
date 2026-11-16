@@ -6,7 +6,7 @@
     <div class="max-w-3xl">
         <x-shared.page-header title="Editar registro" :subtitle="$book->title" />
 
-        <div class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <div class="panel p-6">
             @include('catalog.partials.form', [
                 'action' => route('books.update', $book),
                 'method' => 'PUT',

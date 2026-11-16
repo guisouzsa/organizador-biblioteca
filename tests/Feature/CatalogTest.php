@@ -311,12 +311,4 @@ class CatalogTest extends TestCase
     {
         $this->postJson('/catalogo/isbn', [])->assertUnprocessable();
     }
-
-    public function test_catalog_has_no_copy_management_routes(): void
-    {
-        $names = collect(app('router')->getRoutes()->getRoutes())->map->getName()->filter()->implode(',');
-
-        $this->assertStringNotContainsString('copies', $names);
-        $this->assertFalse(Schema::hasTable('book_copies'));
-    }
 }

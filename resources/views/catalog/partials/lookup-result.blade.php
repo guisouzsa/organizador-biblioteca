@@ -44,7 +44,7 @@
             <p class="mt-1">
                 Fontes consultadas:
                 @foreach ($result['sources'] as $source)
-                    <span class="mr-1 inline-block rounded-full bg-white px-2 py-0.5 text-xs font-medium ring-1 ring-emerald-300">{{ \App\Models\BookSource::providerLabel($source['provider']) }}</span>
+                    <span class="mr-1 inline-block rounded-md bg-white px-2 py-0.5 text-xs font-medium ring-1 ring-emerald-300">{{ \App\Models\BookSource::providerLabel($source['provider']) }}</span>
                 @endforeach
             </p>
             @foreach ($result['errors'] as $provider => $error)
@@ -79,14 +79,14 @@
             </div>
         @endif
 
-        <div class="flex gap-4 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+        <div class="panel flex gap-4 p-4">
             @if (! empty($values['cover_url']))
                 <img src="{{ $values['cover_url'] }}" alt="Capa encontrada" referrerpolicy="no-referrer" class="h-40 w-28 shrink-0 rounded-md bg-slate-100 object-cover shadow-sm">
             @endif
             <p class="self-center text-sm text-slate-600">Todos os campos podem ser editados antes de salvar. Nada é gravado até você confirmar.</p>
         </div>
 
-        <div class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <div class="panel p-6">
             @include('catalog.partials.form', [
                 'action' => route('books.store'),
                 'method' => 'POST',

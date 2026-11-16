@@ -3,20 +3,20 @@
 @section('title', 'Disciplinas e categorias — '.config('app.name'))
 
 @php
-    $cell = 'rounded-md border-0 px-2 py-1.5 text-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-indigo-600';
+    $cell = 'field px-2 py-1.5';
 @endphp
 
 @section('content')
     <x-shared.page-header title="Disciplinas e categorias" subtitle="Classificam os livros do catálogo. Itens em uso não são excluídos: são arquivados." />
 
-    <form method="POST" action="{{ route('categories.store') }}" class="mb-6 grid gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:grid-cols-4" novalidate data-once>
+    <form method="POST" action="{{ route('categories.store') }}" class="panel mb-6 grid gap-3 p-4 sm:grid-cols-4" novalidate data-once>
         @csrf
         <x-shared.input name="name" label="Nova categoria" :value="''" required class="sm:col-span-2" />
         <x-shared.select name="type" label="Tipo" :options="$types" value="discipline" required />
-        <div class="flex items-end"><button class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">Adicionar</button></div>
+        <div class="flex items-end"><button class="btn btn-primary">Adicionar</button></div>
     </form>
 
-    <div class="overflow-x-auto rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+    <div class="panel overflow-x-auto">
         <table class="min-w-full divide-y divide-slate-200 text-sm">
             <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr><th class="px-4 py-3">Nome</th><th class="px-4 py-3">Tipo</th><th class="px-4 py-3">Livros</th><th class="px-4 py-3">Situação</th><th class="px-4 py-3"></th></tr></thead>
             <tbody class="divide-y divide-slate-100">
@@ -35,9 +35,9 @@
                         <td class="px-4 py-2"><a href="{{ route('books.index', ['category' => $category->id]) }}" class="text-indigo-700 hover:underline">{{ $category->books_count }}</a></td>
                         <td class="px-4 py-2">@if ($category->archived_at)<x-shared.badge>Arquivada</x-shared.badge>@else<x-shared.badge tone="emerald">Ativa</x-shared.badge>@endif</td>
                         <td class="whitespace-nowrap px-4 py-2 text-right">
-                            <button form="{{ $f }}" class="rounded-md px-3 py-1.5 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100">Salvar</button>
+                            <button form="{{ $f }}" class="btn btn-secondary">Salvar</button>
                             <form method="POST" action="{{ route('categories.archive', $category) }}" class="inline">@csrf
-                                <button class="rounded-md px-3 py-1.5 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100">{{ $category->archived_at ? 'Restaurar' : 'Arquivar' }}</button>
+                                <button class="btn btn-secondary">{{ $category->archived_at ? 'Restaurar' : 'Arquivar' }}</button>
                             </form>
                         </td>
                     </tr>
@@ -46,10 +46,10 @@
         </table>
     </div>
 
-    <h2 class="mb-2 mt-10 text-lg font-semibold">Coleções didáticas</h2>
+    <h2 class="mb-2 mt-10 text-lg">Coleções didáticas</h2>
     <p class="mb-4 text-sm text-slate-600">Ex.: coleções do PNLD. A situação “oficial” só deve ser marcada depois de conferir a fonte (FNDE, Seduc). O sistema não importa coleções automaticamente.</p>
 
-    <form method="POST" action="{{ route('collections.store') }}" class="mb-6 grid gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:grid-cols-3 lg:grid-cols-4" novalidate data-once>
+    <form method="POST" action="{{ route('collections.store') }}" class="panel mb-6 grid gap-3 p-4 sm:grid-cols-3 lg:grid-cols-4" novalidate data-once>
         @csrf
         <x-shared.input name="name" label="Nome da coleção" :value="''" required class="sm:col-span-2" />
         <x-shared.input name="publisher" label="Editora" :value="''" />
@@ -58,13 +58,13 @@
         <x-shared.input name="cycle" label="Ciclo" :value="''" placeholder="Ex.: 2026–2029" />
         <x-shared.input name="source" label="Fonte da informação" :value="''" />
         <x-shared.select name="verification_status" label="Situação" :options="['unverified' => 'Não verificada', 'confirmed' => 'Conferida', 'official' => 'Oficial (fonte confirmada)']" value="unverified" />
-        <div class="flex items-end"><button class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">Adicionar coleção</button></div>
+        <div class="flex items-end"><button class="btn btn-primary">Adicionar coleção</button></div>
     </form>
 
     @if ($collections->isEmpty())
         <x-shared.empty-state title="Nenhuma coleção cadastrada." text="Coleções agrupam livros de um programa ou série didática." icon="tag" />
     @else
-        <div class="overflow-x-auto rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+        <div class="panel overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200 text-sm">
                 <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr><th class="px-4 py-3">Coleção</th><th class="px-4 py-3">Editora</th><th class="px-4 py-3">Programa / ciclo</th><th class="px-4 py-3">Livros</th><th class="px-4 py-3">Situação</th><th class="px-4 py-3"></th></tr></thead>
                 <tbody class="divide-y divide-slate-100">
@@ -86,7 +86,7 @@
                                     @foreach (['unverified' => 'Não verificada', 'confirmed' => 'Conferida', 'official' => 'Oficial'] as $v => $l)<option value="{{ $v }}" @selected($collection->verification_status === $v)>{{ $l }}</option>@endforeach
                                 </select>
                             </td>
-                            <td class="px-4 py-2 text-right"><button form="{{ $f }}" class="rounded-md px-3 py-1.5 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100">Salvar</button></td>
+                            <td class="px-4 py-2 text-right"><button form="{{ $f }}" class="btn btn-secondary">Salvar</button></td>
                         </tr>
                     @endforeach
                 </tbody>

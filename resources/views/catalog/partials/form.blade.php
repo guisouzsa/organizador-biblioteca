@@ -79,7 +79,7 @@
         <div class="sm:col-span-2">
             <label for="f-description" class="block text-sm font-medium text-slate-700">Descrição</label>
             <textarea id="f-description" name="description" rows="4"
-                      class="mt-1 block w-full rounded-md border-0 bg-white px-3 py-2 text-sm shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600">{{ old('description', $values['description'] ?? '') }}</textarea>
+                      class="field">{{ old('description', $values['description'] ?? '') }}</textarea>
             @error('description')<p class="mt-1 text-xs text-rose-600">{{ $message }}</p>@enderror
         </div>
     </div>
@@ -88,7 +88,7 @@
         <legend class="text-sm font-medium text-slate-700">Disciplina / categoria</legend>
         <div class="mt-2 flex flex-wrap gap-2">
             @foreach ($categories as $category)
-                <label class="inline-flex cursor-pointer items-center gap-2 rounded-full bg-white px-3 py-1.5 text-sm ring-1 ring-inset ring-slate-300 has-[:checked]:bg-indigo-50 has-[:checked]:text-indigo-800 has-[:checked]:ring-indigo-400 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-indigo-600">
+                <label class="inline-flex cursor-pointer items-center gap-2 rounded-md bg-white px-3 py-1.5 text-sm ring-1 ring-inset ring-slate-300 has-[:checked]:bg-indigo-50 has-[:checked]:text-indigo-800 has-[:checked]:ring-indigo-400 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-indigo-600">
                     <input type="checkbox" name="categories[]" value="{{ $category->id }}" class="sr-only" @checked(in_array($category->id, $selectedCategories, true))>
                     {{ $category->name }}
                 </label>
@@ -111,9 +111,9 @@
     @endif
 
     <div class="flex flex-wrap gap-3 border-t border-slate-200 pt-6">
-        <button type="submit" class="rounded-md bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+        <button type="submit" class="btn btn-primary">
             {{ $submitLabel }}
         </button>
-        <a href="{{ route('books.index') }}" class="rounded-md px-4 py-2.5 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100">Cancelar</a>
+        <a href="{{ route('books.index') }}" class="btn btn-secondary">Cancelar</a>
     </div>
 </form>

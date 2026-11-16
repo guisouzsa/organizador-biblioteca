@@ -3,115 +3,166 @@
 @section('title', 'Catálogo — '.config('app.name'))
 
 @php
-    $select = 'mt-1 block w-full rounded-md border-0 bg-white px-3 py-2 text-sm shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600';
     $hasFilters = collect($filters)->filter()->isNotEmpty();
+    $secondary = collect($filters)->except('q')->filter()->count();
+    $view = request('vista') === 'lista' ? 'lista' : 'grade';
+    $q = fn (array $extra) => route('books.index', array_filter(array_merge(request()->query(), $extra)));
 @endphp
 
 @section('content')
-    <x-shared.page-header title="Catálogo" :subtitle="$books->total().' '.($books->total() === 1 ? 'livro' : 'livros').($hasFilters ? ' encontrados' : ' cadastrados')">
+    <x-shared.page-header eyebrow="Catálogo bibliográfico" title="Catálogo" :subtitle="$books->total().' '.($books->total() === 1 ? 'livro' : 'livros').($hasFilters ? ' encontrados' : ' cadastrados')">
         @can('catalog.create')
-            <a href="{{ route('books.scanner') }}" class="rounded-md bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Escanear livro</a>
-            <a href="{{ route('books.create') }}" class="rounded-md px-4 py-2.5 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100">Cadastro manual</a>
+            <a href="{{ route('books.scanner') }}" class="btn btn-primary flex-1 sm:flex-none"><x-shared.icon name="scan" class="h-4 w-4" /> Escanear livro</a>
+            <a href="{{ route('books.create') }}" class="btn btn-secondary flex-1 sm:flex-none">Cadastro manual</a>
         @endcan
     </x-shared.page-header>
 
-    <form method="GET" action="{{ route('books.index') }}" class="grid gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:grid-cols-2 lg:grid-cols-6">
-        <div class="sm:col-span-2">
-            <label for="q" class="block text-sm font-medium text-slate-700">Buscar</label>
-            <input id="q" name="q" type="search" value="{{ $filters['q'] ?? '' }}" placeholder="Título, autor ou ISBN" class="{{ $select }}">
-        </div>
+    <form method="GET" action="{{ route('books.index') }}" role="search" aria-label="Pesquisar no catálogo">
+        <input type="hidden" name="vista" value="{{ $view }}">
+
         <div>
-            <label for="category" class="block text-sm font-medium text-slate-700">Disciplina</label>
-            <select id="category" name="category" class="{{ $select }}">
-                <option value="">Todas</option>
-                @foreach ($categories as $category)
-                    <option value="{{ $category->id }}" @selected(($filters['category'] ?? null) == $category->id)>{{ $category->name }}</option>
-                @endforeach
-            </select>
+            <label for="q" class="sr-only">Buscar por título, autor ou ISBN</label>
+            <div class="relative">
+                <x-shared.icon name="search" class="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
+                <input id="q" name="q" type="search" value="{{ $filters['q'] ?? '' }}" placeholder="Título, autor ou ISBN" autocomplete="off" enterkeyhint="search"
+                       class="field !min-h-12 !pl-11 !pr-24 !text-base">
+                <button type="submit" class="btn btn-primary absolute right-1 top-1/2 !min-h-10 -translate-y-1/2 !px-3.5">Buscar</button>
+            </div>
         </div>
-        <div>
-            <label for="publisher" class="block text-sm font-medium text-slate-700">Editora</label>
-            <select id="publisher" name="publisher" class="{{ $select }}">
-                <option value="">Todas</option>
-                @foreach ($publishers as $publisher)
-                    <option value="{{ $publisher }}" @selected(($filters['publisher'] ?? null) === $publisher)>{{ $publisher }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div>
-            <label for="year" class="block text-sm font-medium text-slate-700">Ano</label>
-            <select id="year" name="year" class="{{ $select }}">
-                <option value="">Todos</option>
-                @foreach ($years as $year)
-                    <option value="{{ $year }}" @selected(($filters['year'] ?? null) == $year)>{{ $year }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div>
-            <label for="collection" class="block text-sm font-medium text-slate-700">Coleção</label>
-            <select id="collection" name="collection" class="{{ $select }}">
-                <option value="">Todas</option>
-                @foreach ($collections as $collection)
-                    <option value="{{ $collection->id }}" @selected(($filters['collection'] ?? null) == $collection->id)>{{ $collection->name }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="flex flex-wrap items-center gap-3 sm:col-span-2 lg:col-span-6">
-            <button type="submit" class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">Filtrar</button>
-            <label class="flex items-center gap-2 text-sm text-slate-600">
-                <input type="checkbox" name="archived" value="1" @checked($filters['archived'] ?? false) class="rounded border-slate-300 text-indigo-600"> Incluir livros arquivados
-            </label>
-            @if ($hasFilters)
-                <a href="{{ route('books.index') }}" class="rounded-md px-4 py-2 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100">Limpar filtros</a>
-            @endif
-        </div>
+
+        <details data-open-lg class="group mt-3 lg:[&>summary]:hidden" @if ($secondary) open @endif>
+            <summary class="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-medium text-slate-700 [&::-webkit-details-marker]:hidden">
+                <x-shared.icon name="filter" class="h-4 w-4" /> Filtros
+                @if ($secondary)<span class="rounded-sm bg-indigo-600 px-1.5 text-xs text-white">{{ $secondary }}</span>@endif
+                <span class="ml-auto text-xs text-slate-500 group-open:hidden">mostrar</span>
+            </summary>
+            <div class="grid gap-3 border-t border-slate-200 pt-3 sm:grid-cols-2 lg:grid-cols-4">
+                <div>
+                    <label for="category" class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Disciplina</label>
+                    <select id="category" name="category" class="field">
+                        <option value="">Todas</option>
+                        @foreach ($categories as $category)
+                            <option value="{{ $category->id }}" @selected(($filters['category'] ?? null) == $category->id)>{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="publisher" class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Editora</label>
+                    <select id="publisher" name="publisher" class="field">
+                        <option value="">Todas</option>
+                        @foreach ($publishers as $publisher)
+                            <option value="{{ $publisher }}" @selected(($filters['publisher'] ?? null) === $publisher)>{{ $publisher }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="year" class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Ano</label>
+                    <select id="year" name="year" class="field">
+                        <option value="">Todos</option>
+                        @foreach ($years as $year)
+                            <option value="{{ $year }}" @selected(($filters['year'] ?? null) == $year)>{{ $year }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="collection" class="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-500">Coleção</label>
+                    <select id="collection" name="collection" class="field">
+                        <option value="">Todas</option>
+                        @foreach ($collections as $collection)
+                            <option value="{{ $collection->id }}" @selected(($filters['collection'] ?? null) == $collection->id)>{{ $collection->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-2 sm:col-span-2 lg:col-span-4">
+                    <label class="flex min-h-11 items-center gap-2 text-sm text-slate-700">
+                        <input type="checkbox" name="archived" value="1" @checked($filters['archived'] ?? false) class="rounded-sm border-slate-400 text-indigo-600"> Incluir arquivados
+                    </label>
+                    <button type="submit" class="btn btn-secondary">Aplicar filtros</button>
+                    @if ($hasFilters)
+                        <a href="{{ route('books.index', ['vista' => $view]) }}" class="btn btn-quiet">Limpar filtros</a>
+                    @endif
+                </div>
+            </div>
+        </details>
     </form>
+
+    <div class="mt-6 flex items-center justify-between border-b border-slate-300 pb-2">
+        <p class="text-sm text-slate-600" aria-live="polite">
+            @if ($books->count()) {{ $books->firstItem() }}–{{ $books->lastItem() }} de {{ $books->total() }} @endif
+        </p>
+        <div class="flex items-center gap-1" role="group" aria-label="Modo de exibição">
+            <a href="{{ $q(['vista' => 'grade']) }}" aria-label="Grade de capas" @if ($view === 'grade') aria-current="true" @endif
+               class="grid h-11 w-11 place-items-center rounded-md {{ $view === 'grade' ? 'bg-slate-200 text-slate-900' : 'text-slate-500 hover:bg-slate-100' }}"><x-shared.icon name="grid" class="h-5 w-5" /></a>
+            <a href="{{ $q(['vista' => 'lista']) }}" aria-label="Lista" @if ($view === 'lista') aria-current="true" @endif
+               class="grid h-11 w-11 place-items-center rounded-md {{ $view === 'lista' ? 'bg-slate-200 text-slate-900' : 'text-slate-500 hover:bg-slate-100' }}"><x-shared.icon name="rows" class="h-5 w-5" /></a>
+        </div>
+    </div>
 
     @if ($books->isEmpty())
         <div class="mt-8">
             @if ($hasFilters)
-                <x-shared.empty-state title="Nenhum livro corresponde aos filtros." text="Tente outros termos ou limpe os filtros." icon="book" />
+                <x-shared.empty-state title="Nenhum livro corresponde à busca." text="Tente outros termos ou limpe os filtros." icon="book">
+                    <a href="{{ route('books.index') }}" class="btn btn-secondary">Limpar filtros</a>
+                </x-shared.empty-state>
             @else
                 <x-shared.empty-state title="O catálogo ainda não tem livros." text="Escaneie o código de barras de um livro ou cadastre-o manualmente." icon="book">
-                    @can('catalog.create')<a href="{{ route('books.scanner') }}" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">Escanear livro</a>@endcan
+                    @can('catalog.create')<a href="{{ route('books.scanner') }}" class="btn btn-primary">Escanear livro</a>@endcan
                 </x-shared.empty-state>
             @endif
         </div>
     @else
-        <ul class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            @foreach ($books as $book)
-                <li class="relative flex gap-4 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 transition hover:ring-indigo-300">
-                    <x-shared.book-cover :book="$book" class="h-36 w-24 shrink-0" />
-                    <div class="min-w-0">
-                        <h2 class="font-semibold leading-snug">
+        @php
+            $availability = function ($book) {
+                if ($book->copies_count === 0) return ['slate', 'Sem exemplares'];
+                if ($book->available_copies_count > 0) return ['emerald', $book->available_copies_count.' de '.$book->copies_count.' disponível(is)'];
+                return ['amber', 'Todos emprestados ('.$book->copies_count.')'];
+            };
+        @endphp
+
+        @if ($view === 'grade')
+            <ul class="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
+                @foreach ($books as $book)
+                    @php([$tone, $text] = $availability($book))
+                    <li class="relative">
+                        <x-shared.book-cover :book="$book" class="w-full" />
+                        <h2 class="mt-3 font-serif text-[0.95rem] leading-snug">
                             <a href="{{ route('books.show', $book) }}" class="after:absolute after:inset-0 hover:text-indigo-700">{{ $book->title }}</a>
                         </h2>
-                        @if ($book->authors)
-                            <p class="mt-1 truncate text-sm text-slate-600">{{ $book->authors }}</p>
-                        @endif
-                        <p class="mt-1 text-sm text-slate-500">
-                            {{ collect([$book->publisher, $book->publication_year])->filter()->implode(' · ') }}
-                        </p>
-                        @if ($book->isbn13 ?? $book->isbn10)
-                            <p class="mt-1 font-mono text-xs text-slate-500">ISBN {{ $book->isbn13 ?? $book->isbn10 }}</p>
-                        @endif
+                        @if ($book->authors)<p class="mt-0.5 truncate text-xs text-slate-600">{{ $book->authors }}</p>@endif
+                        <p class="mt-0.5 truncate text-xs text-slate-500">{{ collect([$book->publisher, $book->publication_year])->filter()->implode(' · ') }}</p>
+                        @if ($book->isbn13 ?? $book->isbn10)<p class="catalog-id mt-1 truncate">ISBN {{ $book->isbn13 ?? $book->isbn10 }}</p>@endif
                         <p class="mt-2 flex flex-wrap gap-1">
-                            @if ($book->isArchived())<x-shared.badge tone="slate">Arquivado</x-shared.badge>@endif
-                            @if ($book->copies_count === 0)
-                                <x-shared.badge tone="slate">Sem exemplares</x-shared.badge>
-                            @elseif ($book->available_copies_count > 0)
-                                <x-shared.badge tone="emerald">{{ $book->available_copies_count }} de {{ $book->copies_count }} disponível(is)</x-shared.badge>
-                            @else
-                                <x-shared.badge tone="amber">Nenhum disponível ({{ $book->copies_count }})</x-shared.badge>
-                            @endif
-                            @foreach ($book->categories->take(3) as $category)
-                                <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">{{ $category->name }}</span>
-                            @endforeach
+                            <x-shared.badge :tone="$tone">{{ $text }}</x-shared.badge>
+                            @if ($book->isArchived())<x-shared.badge>Arquivado</x-shared.badge>@endif
                         </p>
-                    </div>
-                </li>
-            @endforeach
-        </ul>
+                    </li>
+                @endforeach
+            </ul>
+        @else
+            <ul class="mt-2">
+                @foreach ($books as $book)
+                    @php([$tone, $text] = $availability($book))
+                    <li class="relative flex gap-4 border-b border-slate-200 py-4">
+                        <x-shared.book-cover :book="$book" class="w-16 shrink-0 sm:w-20" />
+                        <div class="min-w-0 flex-1">
+                            <h2 class="font-serif text-lg leading-snug">
+                                <a href="{{ route('books.show', $book) }}" class="after:absolute after:inset-0 hover:text-indigo-700">{{ $book->title }}</a>
+                            </h2>
+                            @if ($book->authors)<p class="mt-0.5 truncate text-sm text-slate-700">{{ $book->authors }}</p>@endif
+                            <p class="mt-0.5 text-xs text-slate-500">{{ collect([$book->publisher, $book->edition ? $book->edition.' ed.' : null, $book->publication_year])->filter()->implode(' · ') }}</p>
+                            @if ($book->isbn13 ?? $book->isbn10)<p class="catalog-id mt-1">ISBN {{ $book->isbn13 ?? $book->isbn10 }}</p>@endif
+                            <p class="mt-2 flex flex-wrap gap-1.5">
+                                <x-shared.badge :tone="$tone">{{ $text }}</x-shared.badge>
+                                @if ($book->isArchived())<x-shared.badge>Arquivado</x-shared.badge>@endif
+                                @foreach ($book->categories->take(2) as $category)
+                                    <span class="rounded-sm bg-slate-100 px-2 py-0.5 text-xs text-slate-700">{{ $category->name }}</span>
+                                @endforeach
+                            </p>
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
 
         <div class="mt-8">{{ $books->links() }}</div>
     @endif

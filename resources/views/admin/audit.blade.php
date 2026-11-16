@@ -2,7 +2,7 @@
 
 @section('title', 'Auditoria — '.config('app.name'))
 
-@php($input = 'mt-1 block w-full rounded-md border-0 bg-white px-3 py-2 text-sm shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600')
+@php($input = 'field')
 
 @section('content')
     <x-shared.page-header title="Histórico de atividades" subtitle="Registro de quem fez o quê. Não pode ser editado nem apagado." />
@@ -11,7 +11,7 @@
         <p class="mb-4 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-600">Você vê as ações do catálogo e do acervo e as suas próprias. A auditoria completa é do Administrador.</p>
     @endif
 
-    <form method="GET" action="{{ route('audit.index') }}" class="grid gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:grid-cols-2 lg:grid-cols-5">
+    <form method="GET" action="{{ route('audit.index') }}" class="panel grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-5">
         <div><label for="evento" class="block text-sm font-medium text-slate-700">Tipo</label>
             <select id="evento" name="evento" class="{{ $input }}"><option value="">Todos</option>
                 @foreach ($events as $prefix => $label)<option value="{{ $prefix }}" @selected(($filters['evento'] ?? '') === $prefix)>{{ $label }}</option>@endforeach
@@ -24,13 +24,13 @@
         @endif
         <div><label for="de" class="block text-sm font-medium text-slate-700">De</label><input id="de" type="date" name="de" value="{{ $filters['de'] ?? '' }}" class="{{ $input }}"></div>
         <div><label for="ate" class="block text-sm font-medium text-slate-700">Até</label><input id="ate" type="date" name="ate" value="{{ $filters['ate'] ?? '' }}" class="{{ $input }}"></div>
-        <div class="flex items-end"><button class="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">Filtrar</button></div>
+        <div class="flex items-end"><button class="btn btn-primary">Filtrar</button></div>
     </form>
 
     @if ($logs->isEmpty())
         <div class="mt-8"><x-shared.empty-state title="Nenhuma atividade encontrada." text="As ações importantes aparecem aqui conforme o sistema é usado." icon="clock" /></div>
     @else
-        <div class="mt-6 overflow-x-auto rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+        <div class="panel mt-6 overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200 text-sm">
                 <thead class="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500"><tr><th class="px-4 py-3">Quando</th><th class="px-4 py-3">Quem</th><th class="px-4 py-3">Evento</th><th class="px-4 py-3">Registro</th><th class="px-4 py-3">Alterações</th></tr></thead>
                 <tbody class="divide-y divide-slate-100">

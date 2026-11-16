@@ -3,7 +3,7 @@
 @section('title', 'Regras de empréstimo — '.config('app.name'))
 
 @php
-    $inp = 'mt-1 block w-full rounded-md border-0 bg-white px-3 py-2 text-sm shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600';
+    $inp = 'field';
 @endphp
 
 @section('content')
@@ -22,7 +22,7 @@
             @php($t = $type->value)
             @php($rule = $rules[$t] ?? null)
             @php($enabled = (bool) old("rules.$t.enabled", $rule !== null))
-            <fieldset class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+            <fieldset class="panel p-5">
                 <legend class="px-1 text-base font-semibold">{{ $type->label() }}</legend>
                 <label class="mb-4 flex items-center gap-2 text-sm font-medium">
                     <input type="checkbox" name="rules[{{ $t }}][enabled]" value="1" @checked($enabled) class="rounded border-slate-300 text-indigo-600">
@@ -78,6 +78,6 @@
         @endforeach
 
         <p class="text-xs text-slate-500">Desmarcar um tipo remove a regra e bloqueia novos empréstimos para ele (os empréstimos existentes continuam).</p>
-        <button type="submit" class="rounded-md bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Salvar regras</button>
+        <button type="submit" class="btn btn-primary">Salvar regras</button>
     </form>
 @endsection

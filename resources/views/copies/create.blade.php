@@ -11,7 +11,7 @@
             Ao registrar várias cópias, cada uma recebe um código diferente.
         </div>
 
-        <form method="POST" action="{{ route('books.copies.store', $book) }}" class="space-y-4 rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200" novalidate data-once>
+        <form method="POST" action="{{ route('books.copies.store', $book) }}" class="panel space-y-4 p-6" novalidate data-once>
             @csrf
             @if ($errors->any())<div role="alert" class="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">Corrija os campos destacados.</div>@endif
 
@@ -26,8 +26,8 @@
             </div>
 
             <div class="flex gap-3 border-t border-slate-200 pt-5">
-                <button type="submit" class="rounded-md bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Registrar e gerar etiquetas</button>
-                <a href="{{ route('books.show', $book) }}" class="rounded-md px-4 py-2.5 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Registrar e gerar etiquetas</button>
+                <a href="{{ route('books.show', $book) }}" class="btn btn-secondary">Cancelar</a>
             </div>
         </form>
     </div>

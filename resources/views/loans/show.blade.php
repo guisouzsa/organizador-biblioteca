@@ -11,11 +11,11 @@
         @elseif ($loan->isOverdue())<x-shared.badge tone="rose" class="self-center">{{ $loan->daysOverdue() }} dia(s) de atraso</x-shared.badge>
         @elseif ($loan->isActive())<x-shared.badge tone="amber" class="self-center">Em andamento</x-shared.badge>
         @else<x-shared.badge tone="emerald" class="self-center">Devolvido</x-shared.badge>@endif
-        @can('renew', $loan)<form method="POST" action="{{ route('loans.renew', $loan) }}" data-once>@csrf<button class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">Renovar</button></form>@endcan
+        @can('renew', $loan)<form method="POST" action="{{ route('loans.renew', $loan) }}" data-once>@csrf<button class="btn btn-primary">Renovar</button></form>@endcan
     </x-shared.page-header>
 
     <div class="grid gap-6 lg:grid-cols-3">
-        <section class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200 lg:col-span-2">
+        <section class="panel p-5 lg:col-span-2">
             <dl class="grid gap-4 text-sm sm:grid-cols-2">
                 <div><dt class="text-slate-500">Leitor</dt><dd class="font-medium"><a href="{{ route('borrowers.show', $loan->borrower) }}" class="text-indigo-700 hover:underline">{{ $loan->borrower->name }}</a></dd></div>
                 <div><dt class="text-slate-500">Exemplar</dt><dd class="font-mono font-medium"><a href="{{ route('copies.show', $loan->copy) }}" class="text-indigo-700 hover:underline">{{ $loan->copy->code() }}</a></dd></div>
@@ -26,7 +26,7 @@
             </dl>
         </section>
 
-        <section class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+        <section class="panel p-5">
             <h2 class="font-semibold">Renovações ({{ $loan->renewals->count() }})</h2>
             @forelse ($loan->renewals as $renewal)
                 <p class="mt-2 text-sm">{{ $renewal->created_at->format('d/m/Y') }}: {{ $renewal->previous_due_on->format('d/m') }} → <strong>{{ $renewal->new_due_on->format('d/m/Y') }}</strong><span class="text-xs text-slate-500"> · {{ $renewal->renewedBy->name }}</span></p>

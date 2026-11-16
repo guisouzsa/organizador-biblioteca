@@ -9,7 +9,7 @@
             Prefere usar a câmera? <a href="{{ route('books.scanner') }}" class="font-medium text-indigo-700 underline">Escanear o código de barras</a>.
         </p>
 
-        <div class="rounded-xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <div class="panel p-6">
             @include('catalog.partials.form', [
                 'action' => route('books.store'),
                 'method' => 'POST',

@@ -9,8 +9,8 @@
 
     <x-shared.page-header :title="$borrower->name" :subtitle="$borrower->type->label().($borrower->registration_number ? ' · matrícula '.$borrower->registration_number : '').($borrower->class_group ? ' · '.$borrower->class_group : '')">
         <x-shared.badge :tone="$tone[$borrower->status->value]" class="self-center">{{ $borrower->status->label() }}</x-shared.badge>
-        @can('loan.create')@if ($borrower->isActive())<a href="{{ route('circulation.desk', ['leitor' => $borrower->id]) }}" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">Registrar empréstimo</a>@endif @endcan
-        @can('update', $borrower)<a href="{{ route('borrowers.edit', $borrower) }}" class="rounded-md px-4 py-2 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100">Editar</a>@endcan
+        @can('loan.create')@if ($borrower->isActive())<a href="{{ route('circulation.desk', ['leitor' => $borrower->id]) }}" class="btn btn-primary">Registrar empréstimo</a>@endif @endcan
+        @can('update', $borrower)<a href="{{ route('borrowers.edit', $borrower) }}" class="btn btn-secondary">Editar</a>@endcan
     </x-shared.page-header>
 
     @if ($borrower->anonymized_at)
@@ -21,7 +21,7 @@
 
     <div class="grid gap-6 lg:grid-cols-3">
         <div class="space-y-6 lg:col-span-2">
-            <section class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-labelledby="ativos">
+            <section class="panel p-5" aria-labelledby="ativos">
                 <h2 id="ativos" class="font-semibold">Empréstimos ativos ({{ $activeLoans->count() }})</h2>
                 @forelse ($activeLoans as $loan)
                     <div class="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm ring-1 ring-slate-100">
@@ -34,7 +34,7 @@
                 @endforelse
             </section>
 
-            <section class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-labelledby="historico">
+            <section class="panel p-5" aria-labelledby="historico">
                 <h2 id="historico" class="font-semibold">Histórico de empréstimos</h2>
                 @forelse ($history as $loan)
                     <div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm">
@@ -48,7 +48,7 @@
         </div>
 
         <div class="space-y-6">
-            <section class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+            <section class="panel p-5">
                 <h2 class="font-semibold">Dados</h2>
                 <dl class="mt-3 space-y-2 text-sm">
                     <div><dt class="text-slate-500">Cadastrado em</dt><dd>{{ $borrower->created_at->format('d/m/Y') }}</dd></div>
@@ -59,7 +59,7 @@
                 </dl>
             </section>
 
-            <section class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+            <section class="panel p-5">
                 <h2 class="font-semibold">Reservas ativas</h2>
                 @forelse ($reservations as $reservation)
                     <p class="mt-2 text-sm"><a href="{{ route('reservations.index', ['livro' => $reservation->book_id]) }}" class="hover:underline">{{ $reservation->book->title }}</a> <x-shared.badge tone="sky">{{ $reservation->status->label() }}</x-shared.badge></p>
@@ -69,15 +69,15 @@
             </section>
 
             @can('changeStatus', $borrower)
-                <section class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+                <section class="panel p-5">
                     <h2 class="font-semibold">Situação do leitor</h2>
                     <form method="POST" action="{{ route('borrowers.status', $borrower) }}" class="mt-3 space-y-3" data-once onsubmit="return confirm('Alterar a situação deste leitor? O histórico será preservado.')">
                         @csrf
-                        <select name="status" aria-label="Nova situação" class="block w-full rounded-md border-0 px-3 py-2 text-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-indigo-600">
+                        <select name="status" aria-label="Nova situação" class="field">
                             @foreach (\App\Enums\BorrowerStatus::cases() as $s)<option value="{{ $s->value }}" @selected($borrower->status === $s)>{{ $s->label() }}</option>@endforeach
                         </select>
                         <x-shared.input name="reason" label="Motivo (opcional)" :value="''" />
-                        <button class="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700">Aplicar</button>
+                        <button class="btn btn-primary">Aplicar</button>
                         <p class="text-xs text-slate-500">Inativar cancela as reservas do leitor. Leitores com empréstimos ativos só mudam de situação após as devoluções.</p>
                     </form>
                 </section>
@@ -88,7 +88,7 @@
                     <h2 class="font-semibold text-rose-800">Remover dados pessoais (LGPD)</h2>
                     <p class="mt-1 text-xs text-slate-600">Apaga nome, matrícula e contatos, mantendo o histórico de forma anônima. <strong>Irreversível.</strong></p>
                     <form method="POST" action="{{ route('borrowers.anonymize', $borrower) }}" class="mt-3" data-once onsubmit="return confirm('Remover definitivamente os dados pessoais deste leitor? Esta ação não pode ser desfeita.')">
-                        @csrf<button class="rounded-md px-3 py-2 text-sm font-medium text-rose-700 ring-1 ring-inset ring-rose-300 hover:bg-rose-50">Anonimizar leitor</button>
+                        @csrf<button class="btn btn-danger">Anonimizar leitor</button>
                     </form>
                 </section>
             @endcan

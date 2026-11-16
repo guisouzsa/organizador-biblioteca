@@ -7,7 +7,7 @@
 @endpush
 
 @php
-    $input = 'block w-full rounded-md border-0 bg-white px-3 py-2.5 text-sm shadow-sm ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600';
+    $input = 'field';
     $needsConfirmation = session('error_context.needs_confirmation');
 @endphp
 
@@ -16,15 +16,15 @@
 
     <div class="grid gap-6 xl:grid-cols-2">
         {{-- EMPRÉSTIMO --}}
-        <section class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-labelledby="emprestar">
-            <h2 id="emprestar" class="flex items-center gap-2 text-lg font-semibold"><span class="grid h-7 w-7 place-items-center rounded-full bg-indigo-600 text-sm text-white">1</span> Emprestar</h2>
+        <section class="panel min-w-0 p-4 sm:p-5" aria-labelledby="emprestar">
+            <h2 id="emprestar" class="flex items-center gap-2 text-lg"><span class="grid h-7 w-7 place-items-center rounded-md bg-indigo-600 text-sm text-white">1</span> Emprestar</h2>
 
             @if (! $borrower)
                 <form method="GET" action="{{ route('circulation.desk') }}" class="mt-4 space-y-2">
                     <label for="q" class="block text-sm font-medium text-slate-700">Leitor (matrícula ou nome)</label>
                     <div class="flex gap-2">
                         <input id="q" name="q" value="{{ $q }}" autofocus autocomplete="off" placeholder="Ex.: 202401 ou Maria" class="{{ $input }}">
-                        <button class="shrink-0 rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">Buscar</button>
+                        <button class="btn btn-primary shrink-0">Buscar</button>
                     </div>
                 </form>
 
@@ -84,7 +84,7 @@
                     <label for="copy_code" class="block text-sm font-medium text-slate-700">Código do exemplar (ou tombo)</label>
                     <div class="flex gap-2">
                         <input id="copy_code" name="copy_code" required autofocus autocomplete="off" placeholder="EX-000123" value="{{ old('copy_code') }}" data-autosubmit class="{{ $input }} font-mono uppercase">
-                        <button type="button" data-camera-for="#copy_code" class="shrink-0 rounded-md px-3 py-2 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100">Câmera</button>
+                        <button type="button" data-camera-for="#copy_code" class="btn btn-secondary shrink-0">Câmera</button>
                     </div>
                     @error('copy_code')<p class="text-xs text-rose-600">{{ $message }}</p>@enderror
                     <p class="text-xs text-slate-500">Etiqueta ilegível? Digite o código impresso abaixo das barras ou use o tombo.</p>
@@ -92,7 +92,7 @@
                     @if ($needsConfirmation)
                         <p role="alert" class="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">Este leitor tem atraso. Ao enviar novamente você confirma o empréstimo mesmo assim.</p>
                     @endif
-                    <button type="submit" @disabled(! $borrower->isActive() || ! $rule) class="rounded-md bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50">
+                    <button type="submit" @disabled(! $borrower->isActive() || ! $rule) class="btn btn-primary">
                         {{ $needsConfirmation ? 'Emprestar mesmo assim' : 'Registrar empréstimo' }}
                     </button>
                 </form>
@@ -100,8 +100,8 @@
         </section>
 
         {{-- DEVOLUÇÃO --}}
-        <section class="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200" aria-labelledby="devolver">
-            <h2 id="devolver" class="flex items-center gap-2 text-lg font-semibold"><span class="grid h-7 w-7 place-items-center rounded-full bg-emerald-600 text-sm text-white">2</span> Devolver</h2>
+        <section class="panel min-w-0 p-4 sm:p-5" aria-labelledby="devolver">
+            <h2 id="devolver" class="flex items-center gap-2 text-lg"><span class="grid h-7 w-7 place-items-center rounded-md bg-emerald-600 text-sm text-white">2</span> Devolver</h2>
             @can('loan.return')
                 <form method="POST" action="{{ route('returns.store') }}" class="mt-4 space-y-3" novalidate data-once>
                     @csrf
@@ -109,7 +109,7 @@
                     <label for="return_code" class="block text-sm font-medium text-slate-700">Código do exemplar (ou tombo)</label>
                     <div class="flex gap-2">
                         <input id="return_code" name="copy_code" required autocomplete="off" placeholder="EX-000123" data-autosubmit class="{{ $input }} font-mono uppercase">
-                        <button type="button" data-camera-for="#return_code" class="shrink-0 rounded-md px-3 py-2 text-sm font-medium text-slate-700 ring-1 ring-inset ring-slate-300 hover:bg-slate-100">Câmera</button>
+                        <button type="button" data-camera-for="#return_code" class="btn btn-secondary shrink-0">Câmera</button>
                     </div>
                     <div>
                         <label for="condition" class="block text-sm font-medium text-slate-700">Conservação na devolução <span class="font-normal text-slate-500">(opcional)</span></label>
@@ -118,7 +118,7 @@
                             @foreach ($conditions as $value => $label)<option value="{{ $value }}">{{ $label }}</option>@endforeach
                         </select>
                     </div>
-                    <button type="submit" class="rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500">Registrar devolução</button>
+                    <button type="submit" class="btn btn-primary">Registrar devolução</button>
                 </form>
             @endcan
 
