@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\CategoryType;
 use App\Models\Category;
 use Illuminate\Database\Seeder;
 
@@ -17,7 +18,7 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         foreach (self::NAMES as $name) {
-            Category::findOrCreateByName($name);
+            Category::findOrCreateByName($name, CategoryType::Discipline);
         }
     }
 }

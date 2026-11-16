@@ -19,7 +19,7 @@ class Book extends Model
     protected $fillable = [
         'title', 'subtitle', 'authors', 'publisher', 'isbn10', 'isbn13', 'edition',
         'publication_year', 'pages', 'description', 'cover_url', 'language', 'format',
-        'collection_id',
+        'collection_id', 'archived_at',
     ];
 
     protected function casts(): array
@@ -27,7 +27,47 @@ class Book extends Model
         return [
             'publication_year' => 'integer',
             'pages' => 'integer',
+            'archived_at' => 'datetime',
         ];
+    }
+
+    public function copies(): HasMany
+    {
+        return $this->hasMany(BookCopy::class);
+    }
+
+    public function reservations(): HasMany
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
+    public function isArchived(): bool
+    {
+        return $this->archived_at !== null;
+    }
+
+    /** Livros não arquivados. */
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->whereNull('archived_at');
+    }
+
+    /** Único ponto da regra "este ISBN já existe" (13 ou 10). */
+    public function scopeWithIsbn(Builder $query, ?string $isbn13, ?string $isbn10 = null): Builder
+    {
+        return $query->where(function (Builder $q) use ($isbn13, $isbn10) {
+            $q->when($isbn13, fn ($q) => $q->orWhere('isbn13', $isbn13))
+                ->when($isbn10, fn ($q) => $q->orWhere('isbn10', $isbn10));
+        })->when(blank($isbn13) && blank($isbn10), fn ($q) => $q->whereRaw('1 = 0'));
+    }
+
+    /** Totais de exemplares (total e disponíveis), derivados. */
+    public function scopeWithCopyCounts(Builder $query): Builder
+    {
+        return $query->withCount([
+            'copies',
+            'copies as available_copies_count' => fn (Builder $q) => $q->available(),
+        ]);
     }
 
     public function categories(): BelongsToMany
@@ -75,6 +115,7 @@ class Book extends Model
     public function scopeFilter(Builder $query, array $filters): Builder
     {
         return $query
+            ->when(! ($filters['archived'] ?? false), fn (Builder $q) => $q->active())
             ->search($filters['q'] ?? null)
             ->when($filters['category'] ?? null, fn (Builder $q, $id) => $q->whereHas('categories', fn (Builder $c) => $c->where('categories.id', $id)))
             ->when($filters['publisher'] ?? null, fn (Builder $q, $v) => $q->where('publisher', $v))
