@@ -52,6 +52,25 @@ npm run dev                            # Vite em modo desenvolvimento (outro ter
 
 No XAMPP (`variables_order = "GPCS"`), `php artisan serve` sem `--no-reload` falhou com "No application encryption key"; com `--no-reload` funciona.
 
+## Catálogo bibliográfico
+
+Telas: `/catalogo` (lista, busca e filtros), `/catalogo/scanner` (câmera), `/catalogo/novo`, `/catalogo/{id}` e `/catalogo/{id}/editar`.
+
+- **Escopo:** somente registro bibliográfico (obra/edição). Exemplares físicos, empréstimos e alunos **não** existem ainda.
+- **ISBN:** aceita ISBN-13 (prefixo 978/979, dígito verificador validado) e ISBN-10 (convertido para ISBN-13). Um EAN-13 sem prefixo 978/979 é rejeitado.
+- **Fontes:** Google Books e Open Library, consultadas no backend (`BookLookupService`). Se uma falhar, a outra é usada. Divergências entre fontes são exibidas antes de salvar.
+- **Google Books:** sem chave a API pode responder HTTP 429. Defina `GOOGLE_BOOKS_API_KEY` no `.env` (chave gratuita do Google Cloud, restrita à Books API).
+- **Câmera:** exige HTTPS (ou `localhost`). Usa ZXing (`@zxing/browser`), somente EAN-13. Há sempre o campo de ISBN manual e o cadastro manual.
+
+Banco local de desenvolvimento (SQLite) enquanto o Supabase não está configurado:
+
+```bash
+touch database/database.sqlite
+DB_CONNECTION=sqlite php artisan migrate --seed   # categorias de disciplinas
+```
+
+As migrations **ainda não foram executadas no Supabase**; execute-as somente depois de validar `php artisan db:check-connection`.
+
 ## Estrutura
 
 ```
