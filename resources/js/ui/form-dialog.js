@@ -2,11 +2,28 @@
 const dialog = document.getElementById('form-dialog');
 const content = document.getElementById('form-dialog-content');
 const title = document.getElementById('form-dialog-title');
+const footer = document.getElementById('form-dialog-actions');
 let sourceUrl = null;
 let trigger = null;
 let dirty = false;
 let inlineHome = null;
 let inlineForm = null;
+let inlineActions = null;
+let submitting = false;
+
+function contentReady() {
+    document.dispatchEvent(new CustomEvent('ui:content-ready', { detail: { root: content } }));
+    const form = content.querySelector('form[data-modal-form]');
+    const actions = form?.querySelector('[data-form-actions]');
+    if (form && actions && footer) {
+        if (!form.id) form.id = `modal-form-${Date.now()}`;
+        actions.querySelectorAll('button').forEach((button) => button.setAttribute('form', form.id));
+        footer.replaceChildren(...actions.children);
+        footer.hidden = false;
+        if (form === inlineForm) inlineActions = actions;
+        actions.remove();
+    }
+}
 
 function isFormPage(url) {
     const path = new URL(url, location.href).pathname;
@@ -46,6 +63,7 @@ async function load(url) {
     const result = extract(await response.text(), response.url);
     title.textContent = result.pageTitle;
     content.replaceChildren(result.fragment);
+    contentReady();
     content.querySelector('[aria-invalid="true"], input:not([type=hidden]), select, textarea')?.focus({ preventScroll: true });
 }
 
@@ -71,6 +89,7 @@ function openInline(form, opener) {
     form.dataset.modalForm = '1';
     sourceUrl = location.href;
     content.replaceChildren(form);
+    contentReady();
     dialog.showModal();
     document.documentElement.classList.add('modal-open');
     form.querySelector('[aria-invalid="true"], input:not([type=hidden]), select, textarea')?.focus({ preventScroll: true });
@@ -120,13 +139,19 @@ dialog?.addEventListener('cancel', (event) => {
 dialog?.addEventListener('close', () => {
     document.documentElement.classList.remove('modal-open');
     if (inlineForm && inlineHome && document.contains(inlineHome)) {
+        if (inlineActions && footer) {
+            inlineActions.append(...footer.children);
+            inlineForm.append(inlineActions);
+        }
         inlineForm.hidden = true;
         inlineForm.removeAttribute('data-modal-form');
         inlineHome.append(inlineForm);
     }
     content.replaceChildren();
+    footer?.replaceChildren();
+    if (footer) footer.hidden = true;
     trigger?.focus?.({ preventScroll: true });
-    trigger = null; dirty = false; inlineHome = null; inlineForm = null;
+    trigger = null; dirty = false; inlineHome = null; inlineForm = null; inlineActions = null;
 });
 
 content?.addEventListener('submit', async (event) => {
@@ -134,6 +159,8 @@ content?.addEventListener('submit', async (event) => {
     if (!(form instanceof HTMLFormElement) || !form.matches('[data-modal-form]')) return;
     event.preventDefault();
     if (!form.reportValidity()) return;
+    if (submitting) return;
+    submitting = true;
     const submitter = event.submitter;
     submitter?.setAttribute('aria-busy', 'true');
     submitter && (submitter.disabled = true);
@@ -149,6 +176,7 @@ content?.addEventListener('submit', async (event) => {
             inlineForm = null;
             inlineHome = null;
             content.replaceChildren(result.fragment);
+            contentReady();
             dirty = true;
             content.querySelector('[aria-invalid="true"], [role="alert"]')?.focus?.();
         } else {
@@ -160,5 +188,7 @@ content?.addEventListener('submit', async (event) => {
         window.UI?.notify('Não foi possível salvar. Confira sua conexão e tente novamente.', 'error');
         submitter?.removeAttribute('aria-busy');
         if (submitter) submitter.disabled = false;
+    } finally {
+        submitting = false;
     }
 });

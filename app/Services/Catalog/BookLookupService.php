@@ -161,7 +161,9 @@ class BookLookupService
 
         foreach ($providers as $name => $service) {
             try {
-                $found = $service->findByIsbn($isbn13);
+                $providerKey = 'bibliographic-isbn:'.$name.':'.$isbn13;
+                $cached = Cache::remember($providerKey, self::CACHE_TTL_SECONDS, fn () => ['result' => $service->findByIsbn($isbn13)]);
+                $found = $cached['result'];
                 if ($found !== null) {
                     $sources[] = $found;
                 }

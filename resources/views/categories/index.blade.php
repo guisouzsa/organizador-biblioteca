@@ -14,7 +14,7 @@
         <p class="required-note sm:col-span-4"><span class="required-mark" aria-hidden="true">*</span> indica campo obrigatório.</p>
         <x-shared.input name="name" label="Nova categoria" :value="''" required class="sm:col-span-2" />
         <x-shared.select name="type" label="Tipo" :options="$types" value="discipline" required />
-        <div class="flex items-end"><button class="btn btn-primary">Adicionar</button></div>
+        <div class="form-actions flex items-end" data-form-actions><button class="btn btn-primary">Adicionar</button></div>
     </form>
 
     <div class="panel overflow-x-auto">
@@ -60,7 +60,7 @@
         <x-shared.input name="cycle" label="Ciclo" :value="''" placeholder="Ex.: 2026–2029" />
         <x-shared.input name="source" label="Fonte da informação" :value="''" />
         <x-shared.select name="verification_status" label="Situação" :options="['unverified' => 'Não verificada', 'confirmed' => 'Conferida', 'official' => 'Oficial (fonte confirmada)']" value="unverified" />
-        <div class="flex items-end"><button class="btn btn-primary">Adicionar coleção</button></div>
+        <div class="form-actions flex items-end" data-form-actions><button class="btn btn-primary">Adicionar coleção</button></div>
     </form>
 
     @if ($collections->isEmpty())

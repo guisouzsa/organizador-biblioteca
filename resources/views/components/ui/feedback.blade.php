@@ -38,6 +38,7 @@
         <button type="button" class="form-dialog__close" data-form-dialog-close aria-label="Fechar formulário">×</button>
     </div>
     <div id="form-dialog-content" class="form-dialog__body" aria-live="polite"></div>
+    <div id="form-dialog-actions" class="form-dialog__foot" hidden></div>
 </dialog>
 
 <template id="ui-icons">

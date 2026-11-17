@@ -1,29 +1,34 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#f5f5f5">
+    <meta name="theme-color" content="#c4c4c4">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', config('app.name'))</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link rel="stylesheet" href="{{ asset('decor/efeitos.css') }}">
-    <link rel="icon" type="image/png" href="{{ asset('decor/logo.png') }}">
 </head>
-<body class="min-h-screen font-sans antialiased fundo-patas">
-    <main class="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-5 py-10">
-        <div class="mb-6">
-            <a href="{{ route('home') }}" class="inline-block">
-                <img src="{{ asset('decor/logo.png') }}" alt="{{ config('app.name') }} — página inicial" width="500" height="500" class="h-32 w-auto object-contain">
+<body class="auth-page font-sans antialiased">
+    <main class="auth-layout">
+        <section class="auth-story" aria-labelledby="auth-brand-title">
+            <a href="{{ route('home') }}" class="wordmark auth-story__brand" aria-label="Voltar à página inicial">
+                <span class="wordmark__mark" aria-hidden="true">OE</span><span>{{ config('app.name') }}</span>
             </a>
-        </div>
-        <div>
-            <div class="espia panel p-5 sm:p-6" style="margin-top: calc(3.25rem + 1rem)">
-                <img class="espia__gato" src="{{ asset('decor/gato-espiando.svg') }}" alt="" aria-hidden="true">
+            <div class="auth-story__content">
+                <p class="marketing-kicker">Biblioteca em movimento</p>
+                <h1 id="auth-brand-title">Organização que aproxima pessoas e livros.</h1>
+                <p>Uma visão clara do acervo e da circulação para apoiar o trabalho diário da biblioteca escolar.</p>
+                <div class="auth-books" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+            </div>
+            <p class="auth-story__footer">Gestão de biblioteca escolar</p>
+        </section>
+        <section class="auth-form-area" aria-label="Autenticação">
+            <div class="auth-form-wrap">
+                <a href="{{ route('home') }}" class="auth-back">← Voltar ao início</a>
                 <x-ui.error-summary />
                 @yield('content')
             </div>
-        </div>
+        </section>
     </main>
     <x-ui.feedback />
 </body>

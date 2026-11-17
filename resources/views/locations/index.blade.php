@@ -11,7 +11,7 @@
         <x-shared.input name="name" label="Nova localização" :value="''" required placeholder="Ex.: Estante A" />
         <x-shared.input name="code" label="Código (opcional)" :value="''" placeholder="Ex.: EA" />
         <x-shared.select name="parent_id" label="Dentro de" :options="$parents->pluck('name', 'id')->all()" placeholder="— (nível principal)" />
-        <div class="flex items-end"><button class="btn btn-primary">Adicionar</button></div>
+        <div class="form-actions flex items-end" data-form-actions><button class="btn btn-primary">Adicionar</button></div>
     </form>
 
     @if ($locations->isEmpty())

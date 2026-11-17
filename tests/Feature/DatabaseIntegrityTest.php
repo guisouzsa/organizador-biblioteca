@@ -88,13 +88,16 @@ class DatabaseIntegrityTest extends TestCase
         $this->assertNull($book->fresh()->collection_id);
     }
 
-    public function test_a_book_cannot_have_two_sources_from_the_same_provider(): void
+    public function test_a_book_can_have_distinct_records_from_one_provider_but_not_duplicate_identity(): void
     {
         $book = Book::factory()->create();
-        $book->sources()->create(['provider' => 'google_books']);
+        $book->sources()->create(['provider' => 'google_books', 'external_id' => 'volume-a']);
+        $book->sources()->create(['provider' => 'google_books', 'external_id' => 'volume-b']);
+
+        $this->assertCount(2, $book->sources);
 
         $this->expectException(UniqueConstraintViolationException::class);
-        $book->sources()->create(['provider' => 'google_books']);
+        $book->sources()->create(['provider' => 'google_books', 'external_id' => 'volume-a']);
     }
 
     public function test_raw_metadata_round_trips_unicode_json(): void

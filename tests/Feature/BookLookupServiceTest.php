@@ -7,6 +7,7 @@ use App\Services\Catalog\BookLookupService;
 use App\Services\Catalog\MetadataComparisonService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 class BookLookupServiceTest extends TestCase
@@ -143,6 +144,21 @@ class BookLookupServiceTest extends TestCase
 
         $this->assertSame('g1', $service->sourcesForToken($result['token'])[0]['external_id']);
         $this->assertSame([], $service->sourcesForToken('inexistente'));
+    }
+
+    public function test_reuses_cached_isbn_results_including_not_found(): void
+    {
+        Cache::clear();
+        Http::fake([
+            'googleapis.com/*' => Http::response(['totalItems' => 0]),
+            'openlibrary.org/*' => Http::response('', 404),
+        ]);
+
+        $service = app(BookLookupService::class);
+        $service->lookup(self::ISBN);
+        $service->lookup(self::ISBN);
+
+        Http::assertSentCount(2);
     }
 
     public function test_comparison_normalizes_case_accents_and_author_order(): void

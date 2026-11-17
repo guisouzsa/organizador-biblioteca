@@ -6,6 +6,7 @@ use App\Models\Book;
 use App\Services\Catalog\BookSearchService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 class BookSearchServiceTest extends TestCase
@@ -41,5 +42,20 @@ class BookSearchServiceTest extends TestCase
 
         $this->assertSame('Ciência', $result['external'][0]['title']);
         $this->assertSame('Science', $result['external'][1]['title']);
+    }
+
+    public function test_reuses_cached_provider_results_for_identical_searches(): void
+    {
+        Cache::clear();
+        Http::fake([
+            'googleapis.com/*' => Http::response(['items' => []]),
+            'openlibrary.org/search.json*' => Http::response(['docs' => []]),
+        ]);
+
+        $service = app(BookSearchService::class);
+        $service->search('literatura brasileira');
+        $service->search('literatura brasileira');
+
+        Http::assertSentCount(2);
     }
 }

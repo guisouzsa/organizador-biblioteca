@@ -20,7 +20,7 @@
         @endcan
     </div>
 
-    <div class="flex gap-3 border-t border-slate-200 pt-5">
+    <div class="form-actions flex gap-3 border-t border-slate-200 pt-5" data-form-actions>
         <button type="submit" class="btn btn-primary">{{ $submitLabel }}</button>
         <a href="{{ $borrower ? route('borrowers.show', $borrower) : route('borrowers.index') }}" class="btn btn-secondary">Cancelar</a>
     </div>

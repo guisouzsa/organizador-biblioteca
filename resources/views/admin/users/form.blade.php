@@ -28,7 +28,7 @@
                 <input type="hidden" name="active" value="1">
             @endif
 
-            <div class="flex gap-3 border-t border-slate-200 pt-5">
+            <div class="form-actions flex gap-3 border-t border-slate-200 pt-5" data-form-actions>
                 <button type="submit" class="btn btn-primary">{{ $user ? 'Salvar' : 'Criar usuário' }}</button>
                 <a href="{{ route('users.index') }}" class="btn btn-secondary">Cancelar</a>
             </div>

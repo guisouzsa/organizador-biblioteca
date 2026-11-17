@@ -2,6 +2,9 @@ import './bootstrap';
 import './ui/dialogs';
 import './ui/select';
 import './ui/form-dialog';
+import './ui/password-toggle';
+import './ui/multistep-form';
+import './ui/form-validation';
 
 // Painel lateral: coluna fixa no desktop; no celular abre pelo botão "Mais" da barra inferior.
 const sidebar = document.getElementById('sidebar');
@@ -98,6 +101,8 @@ document.querySelectorAll('form[data-loading]').forEach((form) => {
 document.querySelectorAll('form[data-once]').forEach((form) => {
     form.addEventListener('submit', () => {
         form.querySelectorAll('button[type=submit]').forEach((button) => {
+            button.dataset.originalLabel = button.textContent;
+            button.textContent = 'Salvando…';
             button.disabled = true;
             button.setAttribute('aria-busy', 'true');
         });

@@ -28,7 +28,7 @@
     @endphp
 
     {{-- Cabeçalho compacto (celular/tablet) --}}
-    <header data-app-header class="sticky top-0 z-30 flex h-14 items-center justify-between gap-2 border-b border-slate-200 bg-white/95 px-4 backdrop-blur-0 lg:hidden"
+    <header data-app-header class="hidden"
             style="padding-top: env(safe-area-inset-top)">
         <a href="{{ route($user->can('dashboard.view') ? 'dashboard' : 'books.index') }}" class="inline-flex min-h-11 items-center">
             <img src="{{ asset('decor/logo.png') }}" alt="" width="500" height="500" class="h-11 w-11 shrink-0 object-contain">
@@ -115,30 +115,29 @@
     </aside>
 
     <div class="lg:pl-72">
-        <main id="conteudo" class="mx-auto w-full max-w-7xl px-4 pb-28 pt-6 sm:px-6 lg:px-12 lg:pb-12 lg:pt-10">
+        <main id="conteudo" class="app-content mx-auto w-full max-w-7xl px-4 pb-32 pt-6 sm:px-6 sm:pt-8 lg:px-12 lg:pb-12 lg:pt-10">
             <x-ui.error-summary />
             @yield('content')
         </main>
     </div>
 
     {{-- Navegação inferior (celular): as quatro áreas mais usadas + "Mais" --}}
-    <nav data-bottom-nav aria-label="Atalhos" class="bottom-nav fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 lg:hidden">
-        <ul class="mx-auto flex max-w-lg items-stretch justify-around">
+    <nav data-bottom-nav aria-label="Atalhos" class="bottom-nav lg:hidden">
+        <ul class="bottom-nav__inner">
             @foreach ($mobileItems as [$route, $icon, $label, $active])
                 <li class="flex-1">
                     <a href="{{ route($route) }}" @if ($active) aria-current="page" @endif
-                       class="relative flex h-16 flex-col items-center justify-center gap-1 text-[0.6875rem] font-medium {{ $active ? 'text-indigo-700' : 'text-slate-500' }}">
-                        @if ($active)<span class="absolute inset-x-5 top-0 h-0.5 bg-indigo-700"></span>@endif
-                        <x-shared.icon :name="$icon" class="h-6 w-6" />
-                        {{ $label }}
+                       class="bottom-nav__item {{ $active ? 'is-active' : '' }}">
+                        <span class="bottom-nav__icon"><x-shared.icon :name="$icon" class="h-5 w-5" /></span>
+                        <span>{{ $label }}</span>
                     </a>
                 </li>
             @endforeach
             <li class="flex-1">
                 <button type="button" data-sidebar-toggle aria-controls="sidebar" aria-expanded="false"
-                        class="flex h-16 w-full flex-col items-center justify-center gap-1 text-[0.6875rem] font-medium text-slate-500">
-                    <x-shared.icon name="menu" class="h-6 w-6" />
-                    Mais
+                        class="bottom-nav__item w-full">
+                    <span class="bottom-nav__icon"><x-shared.icon name="menu" class="h-5 w-5" /></span>
+                    <span>Mais</span>
                 </button>
             </li>
         </ul>

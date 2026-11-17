@@ -12,7 +12,7 @@
     $book = $book ?? null;
 @endphp
 
-<form method="POST" action="{{ $action }}" class="space-y-8" novalidate data-once data-dirty-guard data-book-form>
+<form method="POST" action="{{ $action }}" class="space-y-8" novalidate data-once data-dirty-guard data-book-form data-multistep-form>
     @csrf
     <p class="required-note"><span class="required-mark" aria-hidden="true">*</span> indica campo obrigatório.</p>
     @if ($method !== 'POST')
@@ -52,7 +52,7 @@
 
     <p class="text-xs text-slate-600"><span class="text-rose-700" aria-hidden="true">*</span> Campo obrigatório. Os demais são opcionais.</p>
 
-    <fieldset class="space-y-4">
+    <fieldset class="space-y-4" data-step="Identificação">
         <legend class="eyebrow mb-1">Identificação</legend>
         <x-shared.input name="title" label="Título" :value="$values['title'] ?? ''" required />
         <x-shared.input name="subtitle" label="Subtítulo" :value="$values['subtitle'] ?? ''" />
@@ -61,7 +61,7 @@
                         hint="Opcional. Livros sem ISBN podem ser cadastrados normalmente." />
     </fieldset>
 
-    <fieldset class="space-y-4">
+    <fieldset class="space-y-4" data-step="Publicação">
         <legend class="eyebrow mb-1">Publicação</legend>
         <div class="grid gap-4 sm:grid-cols-2">
             <x-shared.input name="publisher" label="Editora" :value="$values['publisher'] ?? ''" />
@@ -73,14 +73,14 @@
         </div>
     </fieldset>
 
-    <fieldset class="space-y-4">
+    <fieldset class="space-y-4" data-step="Descrição">
         <legend class="eyebrow mb-1">Capa e descrição</legend>
         <x-shared.input name="cover_url" label="URL da capa" type="url" :value="$values['cover_url'] ?? ''" inputmode="url"
                         hint="Opcional. Só use um endereço que você tenha conferido." />
         <x-shared.textarea name="description" label="Descrição" rows="4" :value="$values['description'] ?? ''" />
     </fieldset>
 
-    <fieldset class="space-y-4">
+    <fieldset class="space-y-4" data-step="Classificação">
         <legend class="eyebrow mb-1">Classificação</legend>
         <div class="grid gap-4 sm:grid-cols-2">
             <x-shared.select name="collection_group" label="Grupo do acervo" data-collection-group
@@ -124,7 +124,7 @@
     @endif
 
     {{-- Barra de ações: fixa no rodapé do celular para ficar ao alcance do polegar --}}
-    <div class="sticky bottom-[4.25rem] z-10 -mx-4 flex flex-col-reverse gap-2 border-t border-cinza-5 bg-white px-4 py-3 sm:static sm:mx-0 sm:flex-row sm:border-0 sm:bg-transparent sm:px-0 sm:pb-0 sm:pt-2 lg:bottom-0">
+    <div class="form-actions flex flex-col-reverse gap-2 border-t border-cinza-5 bg-white pt-3 sm:flex-row sm:border-0 sm:bg-transparent sm:pt-2" data-form-actions>
         <a href="{{ route('books.index') }}" data-discard class="btn btn-secondary max-sm:w-full">Cancelar</a>
         <button type="submit" class="btn btn-primary max-sm:w-full">{{ $submitLabel }}</button>
     </div>

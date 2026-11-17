@@ -26,7 +26,7 @@
                 <x-shared.textarea name="notes" label="Observações" class="sm:col-span-2" />
             </div>
 
-            <div class="flex gap-3 border-t border-slate-200 pt-5">
+            <div class="form-actions flex gap-3 border-t border-slate-200 pt-5" data-form-actions>
                 <button type="submit" class="btn btn-primary">Registrar e gerar etiquetas</button>
                 <a href="{{ route('books.show', $book) }}" class="btn btn-secondary">Cancelar</a>
             </div>
