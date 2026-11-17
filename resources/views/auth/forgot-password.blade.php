@@ -11,5 +11,5 @@
         <x-shared.input name="email" label="E-mail" type="email" required autofocus />
         <button type="submit" class="btn btn-primary w-full">Enviar instruções</button>
     </form>
-    <p class="mt-4 text-center text-sm"><a href="{{ route('login') }}" class="font-medium text-indigo-700 hover:underline">Voltar ao login</a></p>
+    <p class="mt-5 text-center text-sm"><a href="{{ route('login') }}" class="back-link">← Voltar ao login</a></p>
 @endsection

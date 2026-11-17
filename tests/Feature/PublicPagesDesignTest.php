@@ -16,6 +16,8 @@ class PublicPagesDesignTest extends TestCase
             ->assertSee('Seu acervo organizado.')
             ->assertSee('Entrar no sistema')
             ->assertSee(route('login'), false)
+            ->assertSee('decor/logo.png', false)
+            ->assertSee('paw-trail', false)
             ->assertDontSee('Perguntas frequentes')
             ->assertDontSee('gato-espiando');
     }

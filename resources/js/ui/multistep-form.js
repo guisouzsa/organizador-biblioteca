@@ -27,9 +27,19 @@ function initializeMultistep(root = document) {
         steps.at(-1).after(review);
 
         const labels = [...steps.map((step) => step.dataset.step), 'Revisão'];
-        labels.forEach((label) => {
+        labels.forEach((label, index) => {
             const item = document.createElement('li');
-            item.textContent = label;
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.innerHTML = `<span class="form-step__status">${index + 1}</span><span>${label}</span>`;
+            button.addEventListener('click', () => {
+                if (index === current || completed.has(index) || index < current) {
+                    current = index;
+                    render();
+                    progress.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
+            item.append(button);
             progressList.append(item);
         });
 
@@ -41,6 +51,7 @@ function initializeMultistep(root = document) {
         actions.append(next);
 
         let current = Math.max(0, steps.findIndex((step) => step.querySelector('[aria-invalid="true"]')));
+        const completed = new Set();
         const panels = [...steps, review];
 
         function refreshReview() {
@@ -71,7 +82,11 @@ function initializeMultistep(root = document) {
             panels.forEach((panel, index) => { panel.hidden = index !== current; });
             [...progressList.children].forEach((item, index) => {
                 item.classList.toggle('is-current', index === current);
-                item.classList.toggle('is-complete', index < current);
+                item.classList.toggle('is-complete', completed.has(index) && index !== current);
+                item.classList.toggle('is-pending', index !== current && !completed.has(index));
+                const status = item.querySelector('.form-step__status');
+                status.textContent = completed.has(index) && index !== current ? '✓' : String(index + 1);
+                item.querySelector('button').disabled = index !== current && !completed.has(index) && index > current;
                 if (index === current) item.setAttribute('aria-current', 'step'); else item.removeAttribute('aria-current');
             });
             back.hidden = current === 0;
@@ -83,10 +98,20 @@ function initializeMultistep(root = document) {
         }
 
         next.addEventListener('click', async () => {
-            if (await validateStep()) { current += 1; render(); progress.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+            if (await validateStep()) {
+                completed.add(current);
+                current += 1;
+                render();
+                progress.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
         });
         back.addEventListener('click', () => { current -= 1; render(); });
-        form.addEventListener('input', (event) => event.target.removeAttribute?.('aria-invalid'));
+        form.addEventListener('input', (event) => {
+            event.target.removeAttribute?.('aria-invalid');
+            const changedStep = steps.findIndex((step) => step.contains(event.target));
+            if (changedStep >= 0) completed.delete(changedStep);
+            render();
+        });
         render();
     });
 }

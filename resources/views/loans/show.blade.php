@@ -3,7 +3,7 @@
 @section('title', 'Empréstimo #'.$loan->id.' — '.config('app.name'))
 
 @section('content')
-    <nav class="mb-4 text-sm"><a href="{{ route('loans.index') }}" class="inline-block py-2 text-indigo-700 hover:underline">← Voltar aos empréstimos</a></nav>
+    <nav class="mb-4 text-sm"><a href="{{ route('loans.index') }}" class="back-link">← Voltar aos empréstimos</a></nav>
 
     <x-shared.page-header :title="'Empréstimo #'.$loan->id" :subtitle="$loan->copy->book->title">
         @if ($loan->outcome === \App\Enums\LoanOutcome::Voided)<x-shared.badge class="self-center">Estornado</x-shared.badge>

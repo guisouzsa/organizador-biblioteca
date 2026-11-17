@@ -35,6 +35,18 @@ class ModalFormsTest extends TestCase
             ->assertSessionHasErrors(['title']);
     }
 
+    public function test_confirmation_dialog_uses_shared_header_body_and_footer(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        $this->actingAs($user)->get(route('dashboard'))
+            ->assertOk()
+            ->assertSee('id="ui-dialog"', false)
+            ->assertSee('class="modal__head"', false)
+            ->assertSee('class="modal__body"', false)
+            ->assertSee('class="modal__foot"', false);
+    }
+
     public function test_catalog_search_remains_a_get_form(): void
     {
         $user = User::factory()->admin()->create();

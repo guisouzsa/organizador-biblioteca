@@ -3,7 +3,7 @@
 @section('title', ($copy->code() ?? 'Exemplar').' — '.config('app.name'))
 
 @section('content')
-    <nav class="mb-4 text-sm"><a href="{{ route('copies.index') }}" class="inline-block py-2 text-indigo-700 hover:underline">← Voltar ao acervo</a></nav>
+    <nav class="mb-4 text-sm"><a href="{{ route('copies.index') }}" class="back-link">← Voltar ao acervo</a></nav>
 
     <x-shared.page-header :title="$copy->code() ?? 'Exemplar'" :subtitle="$copy->book->title">
         <x-shared.badge :tone="$situation['tone']" class="self-center">{{ $situation['label'] }}</x-shared.badge>

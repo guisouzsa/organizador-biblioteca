@@ -24,7 +24,7 @@
 
 @section('content')
     <nav aria-label="Navegação estrutural" class="mb-4 text-sm">
-        <a href="{{ route('books.index') }}" class="inline-flex min-h-11 items-center text-indigo-700 hover:underline">← Voltar ao catálogo</a>
+        <a href="{{ route('books.index') }}" class="back-link">← Voltar ao catálogo</a>
     </nav>
 
     <article class="grid gap-6 md:grid-cols-[11rem_1fr] md:gap-10">

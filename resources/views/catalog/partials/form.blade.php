@@ -12,7 +12,10 @@
     $book = $book ?? null;
 @endphp
 
-<form method="POST" action="{{ $action }}" class="space-y-8" novalidate data-once data-dirty-guard data-book-form data-multistep-form>
+<form method="POST" action="{{ $action }}" class="space-y-8" novalidate data-once data-dirty-guard data-book-form data-multistep-form
+      data-confirm="Deseja salvar as informações deste livro? Confira a revisão antes de continuar."
+      data-confirm-title="Confirmar {{ $method === 'POST' ? 'cadastro' : 'edição' }}"
+      data-confirm-label="Confirmar e salvar">
     @csrf
     <p class="required-note"><span class="required-mark" aria-hidden="true">*</span> indica campo obrigatório.</p>
     @if ($method !== 'POST')
@@ -57,7 +60,7 @@
         <x-shared.input name="title" label="Título" :value="$values['title'] ?? ''" required />
         <x-shared.input name="subtitle" label="Subtítulo" :value="$values['subtitle'] ?? ''" />
         <x-shared.input name="authors" label="Autores" :value="$values['authors'] ?? ''" hint="Separe vários autores com ponto e vírgula." />
-        <x-shared.input name="isbn" label="ISBN (10 ou 13)" :value="$values['isbn'] ?? ''" inputmode="text" autocomplete="off"
+        <x-shared.input name="isbn" label="ISBN (10 ou 13)" :value="$values['isbn'] ?? ''" inputmode="text" autocomplete="off" data-isbn
                         hint="Opcional. Livros sem ISBN podem ser cadastrados normalmente." />
     </fieldset>
 

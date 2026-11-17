@@ -5,7 +5,7 @@
 @php($tone = ['active' => 'emerald', 'inactive' => 'slate', 'transferred' => 'amber', 'graduated' => 'sky'])
 
 @section('content')
-    <nav class="mb-4 text-sm"><a href="{{ route('borrowers.index') }}" class="inline-block py-2 text-indigo-700 hover:underline">← Voltar aos leitores</a></nav>
+    <nav class="mb-4 text-sm"><a href="{{ route('borrowers.index') }}" class="back-link">← Voltar aos leitores</a></nav>
 
     <x-shared.page-header :title="$borrower->name" :subtitle="$borrower->type->label().($borrower->registration_number ? ' · matrícula '.$borrower->registration_number : '').($borrower->class_group ? ' · '.$borrower->class_group : '')">
         <x-shared.badge :tone="$tone[$borrower->status->value]" class="self-center">{{ $borrower->status->label() }}</x-shared.badge>

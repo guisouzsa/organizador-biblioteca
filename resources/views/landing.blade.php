@@ -7,13 +7,16 @@
     <meta name="description" content="Organização de acervo, leitores e circulação para bibliotecas escolares.">
     <title>{{ config('app.name') }} — gestão de biblioteca escolar</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="{{ asset('decor/efeitos.css') }}">
+    <link rel="icon" type="image/png" href="{{ asset('decor/logo.png') }}">
 </head>
 <body class="marketing-page font-sans antialiased">
     <a href="#conteudo" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-white focus:px-4 focus:py-3">Ir para o conteúdo</a>
     <header class="marketing-header">
         <div class="marketing-shell marketing-header__inner">
             <a href="{{ route('home') }}" class="wordmark" aria-label="{{ config('app.name') }} — início">
-                <span class="wordmark__mark" aria-hidden="true">OE</span><span>{{ config('app.name') }}</span>
+                <img src="{{ asset('decor/logo.png') }}" alt="" aria-hidden="true" class="marketing-logo">
+                <span>{{ config('app.name') }}</span>
             </a>
             @auth
                 <a href="{{ route('dashboard') }}" class="marketing-link-button">Abrir painel</a>
@@ -24,6 +27,7 @@
     </header>
     <main id="conteudo">
         <section class="marketing-hero">
+            <div class="paw-trail paw-trail--hero" aria-hidden="true"><span></span><span></span><span></span></div>
             <div class="marketing-shell marketing-hero__grid">
                 <div class="marketing-hero__copy">
                     <p class="marketing-kicker">Gestão de biblioteca escolar</p>
@@ -60,10 +64,14 @@
                     </ul>
                 </div>
             </div>
+            <div class="paw-trail paw-trail--purpose" aria-hidden="true"><span></span><span></span></div>
         </section>
     </main>
     <footer class="marketing-footer">
-        <div class="marketing-shell marketing-footer__inner"><span>{{ config('app.name') }}</span><span>Gestão de biblioteca escolar</span></div>
+        <div class="marketing-shell marketing-footer__inner">
+            <span class="marketing-footer__brand"><img src="{{ asset('decor/logo.png') }}" alt="" aria-hidden="true">{{ config('app.name') }}</span>
+            <span>Gestão de biblioteca escolar</span>
+        </div>
     </footer>
     <x-ui.feedback />
 </body>

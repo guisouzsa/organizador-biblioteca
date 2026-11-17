@@ -40,6 +40,8 @@ class MobileExperienceTest extends TestCase
             ->assertSee('data-step="Identificação"', false)
             ->assertSee('data-step="Publicação"', false)
             ->assertSee('data-step="Classificação"', false)
+            ->assertSee('data-confirm-title="Confirmar cadastro"', false)
+            ->assertSee('data-isbn', false)
             ->assertSee('data-form-actions', false);
     }
 }
