@@ -4,7 +4,7 @@
 
 <div {{ $attributes->only('class') }}>
     <label for="{{ $id }}" class="mb-1 block text-sm font-medium text-slate-800">
-        {{ $label }}@if ($required) <span class="text-rose-700" aria-hidden="true">*</span>@endif
+        {{ $label }}@if ($required) <span class="required-mark" aria-hidden="true">*</span>@endif
     </label>
     <select id="{{ $id }}" name="{{ $name }}" @if ($required) required @endif {{ $attributes->except('class') }}
             @error($name) aria-invalid="true" @enderror class="field">

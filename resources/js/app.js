@@ -1,6 +1,7 @@
 import './bootstrap';
 import './ui/dialogs';
 import './ui/select';
+import './ui/form-dialog';
 
 // Painel lateral: coluna fixa no desktop; no celular abre pelo botão "Mais" da barra inferior.
 const sidebar = document.getElementById('sidebar');

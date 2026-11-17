@@ -333,6 +333,26 @@
 @layer components {
     html.modal-open { overflow: hidden; }
 
+    .required-mark { color: var(--color-slate-900); font-weight: 700; }
+    .required-note { margin-bottom: 1rem; color: var(--color-slate-600); font-size: 0.75rem; }
+
+    dialog.form-dialog {
+        margin: auto; padding: 0; width: min(58rem, calc(100vw - 2rem));
+        max-height: min(52rem, calc(100dvh - 2rem)); border: 1px solid var(--color-cinza-5);
+        border-radius: var(--radius-2xl); background: var(--color-white); color: var(--color-slate-900);
+        box-shadow: var(--shadow-lg); overflow: hidden;
+    }
+    dialog.form-dialog[open] { display: flex; flex-direction: column; animation: modal-in 180ms ease-out; }
+    dialog.form-dialog::backdrop { background: rgb(23 23 23 / 0.52); animation: modal-fade 180ms ease-out; }
+    .form-dialog__head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.25rem; border-bottom: 1px solid var(--color-slate-200); }
+    .form-dialog__title { font-size: 1.125rem; font-weight: 600; line-height: 1.35; }
+    .form-dialog__close { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; flex: none; border-radius: var(--radius-lg); color: var(--color-slate-700); font-size: 1.6rem; line-height: 1; }
+    .form-dialog__close:hover { background: var(--color-slate-100); }
+    .form-dialog__body { flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; padding: 1.25rem; }
+    .form-dialog__body > .max-w-3xl, .form-dialog__body > .max-w-2xl, .form-dialog__body > .max-w-xl { max-width: none; }
+    .form-dialog__body .panel { box-shadow: none; }
+    .form-dialog__loading { padding: 3rem 1rem; text-align: center; color: var(--color-slate-600); }
+
     dialog.modal {
         margin: auto;
         padding: 0;
@@ -383,6 +403,9 @@
 
     /* Celular: o modal ocupa a largura útil, respeita a área segura e os botões empilham (principal em cima) */
     @media (max-width: 639px) {
+        dialog.form-dialog { width: 100vw; height: 100dvh; max-height: 100dvh; border: 0; border-radius: 0; }
+        .form-dialog__head { padding: 0.875rem 1rem; padding-top: calc(0.875rem + env(safe-area-inset-top)); }
+        .form-dialog__body { padding: 1rem; padding-bottom: calc(1rem + env(safe-area-inset-bottom)); }
         dialog.modal {
             width: calc(100vw - 1.5rem);
             max-height: calc(100dvh - 1.5rem - env(safe-area-inset-bottom) - env(safe-area-inset-top));

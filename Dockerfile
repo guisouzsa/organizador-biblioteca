@@ -42,4 +42,4 @@ RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
 
 # Escuta no host 0.0.0.0 e na porta dinâmica fornecida pelo Render ($PORT)
 EXPOSE 8000
-CMD ["sh", "-c", "php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"]
+CMD ["sh", "-c", "php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"]

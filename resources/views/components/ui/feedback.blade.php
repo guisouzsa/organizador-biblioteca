@@ -29,6 +29,17 @@
     <div class="modal__foot" id="ui-dialog-actions"></div>
 </dialog>
 
+<dialog id="form-dialog" class="form-dialog" aria-labelledby="form-dialog-title">
+    <div class="form-dialog__head">
+        <div>
+            <p class="eyebrow">Formulário</p>
+            <h2 id="form-dialog-title" class="form-dialog__title">Carregando…</h2>
+        </div>
+        <button type="button" class="form-dialog__close" data-form-dialog-close aria-label="Fechar formulário">×</button>
+    </div>
+    <div id="form-dialog-content" class="form-dialog__body" aria-live="polite"></div>
+</dialog>
+
 <template id="ui-icons">
     <span data-icon="success"><x-shared.icon name="check" class="h-5 w-5" /></span>
     <span data-icon="info"><x-shared.icon name="info" class="h-5 w-5" /></span>

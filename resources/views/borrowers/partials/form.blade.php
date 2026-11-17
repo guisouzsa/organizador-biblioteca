@@ -4,6 +4,7 @@
 
 <form method="POST" action="{{ $action }}" class="space-y-4" novalidate data-once>
     @csrf
+    <p class="required-note"><span class="required-mark" aria-hidden="true">*</span> indica campo obrigatório.</p>
     @if ($method !== 'POST') @method($method) @endif
 
     @if ($errors->any())<div role="alert" class="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">Corrija os campos destacados.</div>@endif

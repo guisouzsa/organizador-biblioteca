@@ -9,8 +9,9 @@
 @section('content')
     <x-shared.page-header title="Disciplinas e categorias" subtitle="Classificam os livros do catálogo. Itens em uso não são excluídos: são arquivados." />
 
-    <form method="POST" action="{{ route('categories.store') }}" class="panel mb-6 grid gap-3 p-4 sm:grid-cols-4" novalidate data-once>
+    <form method="POST" action="{{ route('categories.store') }}" class="panel grid gap-3 p-4 sm:grid-cols-4" novalidate data-once data-inline-modal data-modal-title="Criar categoria ou disciplina" data-modal-trigger="Nova categoria">
         @csrf
+        <p class="required-note sm:col-span-4"><span class="required-mark" aria-hidden="true">*</span> indica campo obrigatório.</p>
         <x-shared.input name="name" label="Nova categoria" :value="''" required class="sm:col-span-2" />
         <x-shared.select name="type" label="Tipo" :options="$types" value="discipline" required />
         <div class="flex items-end"><button class="btn btn-primary">Adicionar</button></div>
@@ -36,7 +37,7 @@
                         <td class="px-4 py-2">@if ($category->archived_at)<x-shared.badge>Arquivada</x-shared.badge>@else<x-shared.badge tone="emerald">Ativa</x-shared.badge>@endif</td>
                         <td class="whitespace-nowrap px-4 py-2 text-right">
                             <button form="{{ $f }}" class="btn btn-secondary">Salvar</button>
-                            <form method="POST" action="{{ route('categories.archive', $category) }}" class="inline">@csrf
+                            <form method="POST" action="{{ route('categories.archive', $category) }}" class="inline" data-confirm="{{ $category->archived_at ? 'A categoria voltará a ficar disponível para novos cadastros.' : 'A categoria deixará de ficar disponível para novos cadastros. Os vínculos existentes serão preservados.' }}" data-confirm-title="{{ $category->archived_at ? 'Restaurar categoria?' : 'Arquivar categoria?' }}" data-confirm-label="{{ $category->archived_at ? 'Restaurar' : 'Arquivar' }}" @if(! $category->archived_at) data-confirm-danger @endif>@csrf
                                 <button class="btn btn-secondary">{{ $category->archived_at ? 'Restaurar' : 'Arquivar' }}</button>
                             </form>
                         </td>
@@ -49,8 +50,9 @@
     <h2 class="mb-2 mt-10 text-lg">Coleções didáticas</h2>
     <p class="mb-4 text-sm text-slate-600">Ex.: coleções do PNLD. A situação “oficial” só deve ser marcada depois de conferir a fonte (FNDE, Seduc). O sistema não importa coleções automaticamente.</p>
 
-    <form method="POST" action="{{ route('collections.store') }}" class="panel mb-6 grid gap-3 p-4 sm:grid-cols-3 lg:grid-cols-4" novalidate data-once>
+    <form method="POST" action="{{ route('collections.store') }}" class="panel grid gap-3 p-4 sm:grid-cols-3 lg:grid-cols-4" novalidate data-once data-inline-modal data-modal-title="Criar coleção didática" data-modal-trigger="Nova coleção">
         @csrf
+        <p class="required-note sm:col-span-3 lg:col-span-4"><span class="required-mark" aria-hidden="true">*</span> indica campo obrigatório.</p>
         <x-shared.input name="name" label="Nome da coleção" :value="''" required class="sm:col-span-2" />
         <x-shared.input name="publisher" label="Editora" :value="''" />
         <x-shared.input name="fnde_code" label="Código FNDE" :value="''" />

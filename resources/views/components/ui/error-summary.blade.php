@@ -1,5 +1,5 @@
 {{-- Resumo de validação: só aparece com 2+ campos inválidos; cada item leva ao campo. Um único erro fica só junto ao campo. --}}
-@if ($errors->count() > 1)
+@if (isset($errors) && $errors->count() > 1)
     @php($keys = array_slice(array_values(array_unique(array_map(fn ($k) => explode('.', $k)[0], $errors->keys()))), 0, 8))
     <div id="error-summary" role="alert" tabindex="-1" class="alert alert--error mb-6">
         <x-shared.icon name="xcircle" class="alert__icon" />

@@ -14,6 +14,7 @@
 
 <form method="POST" action="{{ $action }}" class="space-y-8" novalidate data-once data-dirty-guard data-book-form>
     @csrf
+    <p class="required-note"><span class="required-mark" aria-hidden="true">*</span> indica campo obrigatório.</p>
     @if ($method !== 'POST')
         @method($method)
     @endif

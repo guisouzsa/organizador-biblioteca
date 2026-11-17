@@ -4,7 +4,7 @@
 
 <div {{ $attributes->only('class') }}>
     <label for="{{ $id }}" class="mb-1 block text-sm font-medium text-slate-800">
-        {{ $label }}@if ($required) <span class="text-rose-700" aria-hidden="true">*</span>@endif
+        {{ $label }}@if ($required) <span class="required-mark" aria-hidden="true">*</span>@endif
     </label>
     <input id="{{ $id }}" name="{{ $name }}" type="{{ $type }}" value="{{ old($name, $value) }}"
            @if ($required) required @endif

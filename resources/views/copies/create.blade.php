@@ -13,6 +13,7 @@
 
         <form method="POST" action="{{ route('books.copies.store', $book) }}" class="panel space-y-4 p-6" novalidate data-once>
             @csrf
+            <p class="required-note"><span class="required-mark" aria-hidden="true">*</span> indica campo obrigatório.</p>
             @if ($errors->any())<div role="alert" class="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">Corrija os campos destacados.</div>@endif
 
             <div class="grid gap-4 sm:grid-cols-2">

@@ -5,8 +5,9 @@
 @section('content')
     <x-shared.page-header title="Localizações físicas" subtitle="Onde os exemplares ficam guardados (sala, estante, prateleira)." />
 
-    <form method="POST" action="{{ route('locations.store') }}" class="panel mb-6 grid gap-3 p-4 sm:grid-cols-4" novalidate data-once>
+    <form method="POST" action="{{ route('locations.store') }}" class="panel grid gap-3 p-4 sm:grid-cols-4" novalidate data-once data-inline-modal data-modal-title="Criar localização" data-modal-trigger="Nova localização">
         @csrf
+        <p class="required-note sm:col-span-4"><span class="required-mark" aria-hidden="true">*</span> indica campo obrigatório.</p>
         <x-shared.input name="name" label="Nova localização" :value="''" required placeholder="Ex.: Estante A" />
         <x-shared.input name="code" label="Código (opcional)" :value="''" placeholder="Ex.: EA" />
         <x-shared.select name="parent_id" label="Dentro de" :options="$parents->pluck('name', 'id')->all()" placeholder="— (nível principal)" />
