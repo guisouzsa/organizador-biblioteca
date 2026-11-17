@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Enums\BorrowerType;
 use App\Enums\CategoryType;
+use App\Enums\UserRole;
 use App\Models\Book;
 use App\Models\BookCopy;
 use App\Models\BookSource;
@@ -12,12 +14,14 @@ use App\Models\Category;
 use App\Models\CopyBarcode;
 use App\Models\Location;
 use App\Models\Loan;
+use App\Models\LoanRenewal;
 use App\Models\LoanRule;
 use App\Models\Reservation;
 use App\Models\User;
 use App\Services\Catalog\OpenLibraryService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class DemoDataSeeder extends Seeder
@@ -59,6 +63,8 @@ class DemoDataSeeder extends Seeder
 
     public function run(): void
     {
+        $this->ensureDemoLibraryDefaults();
+
         $locations = $this->locations();
         $provider = app(OpenLibraryService::class);
         $books = collect();
@@ -110,6 +116,45 @@ class DemoDataSeeder extends Seeder
         $this->circulation($books, $borrowers);
     }
 
+    private function ensureDemoLibraryDefaults(): void
+    {
+        User::firstOrCreate(
+            ['email' => 'biblioteca.demo@example.invalid'],
+            [
+                'name' => 'Bibliotecária de Demonstração',
+                'password' => Hash::make('demo-123456'),
+                'role' => UserRole::Librarian,
+                'active' => true,
+                'must_change_password' => false,
+            ],
+        );
+
+        foreach ($this->defaultLoanRules() as $rule) {
+            LoanRule::updateOrCreate(
+                ['borrower_type' => $rule['borrower_type']],
+                [
+                    'loan_days' => $rule['loan_days'],
+                    'max_active_loans' => $rule['max_active_loans'],
+                    'max_renewals' => $rule['max_renewals'],
+                    'renewal_days' => $rule['renewal_days'],
+                    'renew_when_overdue' => $rule['renew_when_overdue'],
+                    'block_when_overdue' => $rule['block_when_overdue'],
+                    'reservation_hold_hours' => $rule['reservation_hold_hours'],
+                ],
+            );
+        }
+    }
+
+    /** @return list<array{borrower_type: string, loan_days: int, max_active_loans: int, max_renewals: int, renewal_days: int, renew_when_overdue: bool, block_when_overdue: bool, reservation_hold_hours: int}> */
+    private function defaultLoanRules(): array
+    {
+        return [
+            ['borrower_type' => BorrowerType::Student->value, 'loan_days' => 7, 'max_active_loans' => 3, 'max_renewals' => 1, 'renewal_days' => 7, 'renew_when_overdue' => false, 'block_when_overdue' => true, 'reservation_hold_hours' => 24],
+            ['borrower_type' => BorrowerType::Staff->value, 'loan_days' => 14, 'max_active_loans' => 5, 'max_renewals' => 2, 'renewal_days' => 14, 'renew_when_overdue' => true, 'block_when_overdue' => false, 'reservation_hold_hours' => 48],
+            ['borrower_type' => BorrowerType::Other->value, 'loan_days' => 10, 'max_active_loans' => 2, 'max_renewals' => 1, 'renewal_days' => 7, 'renew_when_overdue' => false, 'block_when_overdue' => true, 'reservation_hold_hours' => 24],
+        ];
+    }
+
     private function locations(): array
     {
         return collect([['Sala principal', 'DEMO-SALA'], ['Estante escolar', 'DEMO-ESC'], ['Estante literatura', 'DEMO-LIT'], ['Referência', 'DEMO-REF']])
@@ -138,46 +183,96 @@ class DemoDataSeeder extends Seeder
     private function borrowers()
     {
         $rows = [
-            ['student','Aluno Demonstração 01','DEMO-A001','6º A','active'], ['student','Aluna Demonstração 02','DEMO-A002','7º B','active'],
-            ['student','Aluno Demonstração 03','DEMO-A003','8º A','active'], ['student','Aluna Demonstração 04','DEMO-A004','9º C','inactive'],
-            ['student','Aluno Demonstração 05','DEMO-A005','1º EM','active'], ['student','Aluna Demonstração 06','DEMO-A006','2º EM','active'],
-            ['student','Aluno Demonstração 07','DEMO-A007','3º EM','graduated'], ['staff','Professora Demonstração 01','DEMO-P001',null,'active'],
-            ['staff','Professor Demonstração 02','DEMO-P002',null,'active'], ['staff','Servidora Demonstração 03','DEMO-S001',null,'active'],
-            ['other','Visitante Demonstração 01','DEMO-V001',null,'active'], ['student','Aluna Demonstração 08','DEMO-A008','5º A','transferred'],
+            ['student','Raquel Evangelista','DEMO-A001','6º A','active'],
+            ['student','Guilherme','DEMO-A002','7º B','active'],
+            ['student','Emanuel','DEMO-A003','8º A','active'],
+            ['student','Pamela','DEMO-A004','9º C','inactive'],
+            ['student','Marianne','DEMO-A005','1º EM','active'],
+            ['student','Larissa','DEMO-A006','2º EM','active'],
+            ['student','Aluno Demonstração 07','DEMO-A007','3º EM','graduated'],
+            ['staff','Professora Demonstração 01','DEMO-P001',null,'active'],
+            ['staff','Professor Demonstração 02','DEMO-P002',null,'active'],
+            ['staff','Servidora Demonstração 03','DEMO-S001',null,'active'],
+            ['other','Visitante Demonstração 01','DEMO-V001',null,'active'],
+            ['student','Aluna Demonstração 08','DEMO-A008','5º A','transferred'],
         ];
         return collect($rows)->map(fn ($r) => Borrower::create([
             'type'=>$r[0], 'name'=>$r[1], 'registration_number'=>$r[2], 'class_group'=>$r[3], 'status'=>$r[4],
-            'email'=>strtolower($r[2]).'@example.invalid', 'demo_batch'=>self::BATCH,
+            'email'=>strtolower(str_replace(' ', '.', $r[2])).'@example.invalid', 'demo_batch'=>self::BATCH,
         ]));
     }
 
     private function circulation($books, $borrowers): void
     {
         $user = User::where('active', true)->first();
-        $rule = LoanRule::where('borrower_type', 'student')->first();
+        $rule = LoanRule::where('borrower_type', BorrowerType::Student->value)->first();
         if (! $user || ! $rule || $books->isEmpty()) return;
 
+        $borrowers = $borrowers->values();
+        $books = $books->values();
         $copies = BookCopy::where('demo_batch', self::BATCH)->where('status', 'active')->get();
-        foreach ($copies->take(3) as $i => $copy) {
+
+        foreach ($copies->take(5) as $i => $copy) {
+            $borrower = $borrowers->get($i);
+            if (! $borrower) break;
+
+            $daysAgo = [1, 3, 7, 15, 30][$i % 5] ?? 1;
+            $loan = Loan::create([
+                'copy_id' => $copy->id,
+                'borrower_id' => $borrower->id,
+                'loaned_by' => $user->id,
+                'loaned_at' => now()->subDays($daysAgo + 1),
+                'due_on' => now()->subDays($daysAgo)->toDateString(),
+                'loan_rule_id' => $rule->id,
+                'notes' => 'Movimentação fictícia de demonstração.',
+                'demo_batch' => self::BATCH,
+            ]);
+
+            if ($i === 0 || $i === 2) {
+                $previousDueOn = $loan->due_on->copy()->subDays(7);
+                $newDueOn = $loan->due_on->copy()->addDays(7);
+                LoanRenewal::create([
+                    'loan_id' => $loan->id,
+                    'renewed_by' => $user->id,
+                    'previous_due_on' => $previousDueOn->toDateString(),
+                    'new_due_on' => $newDueOn->toDateString(),
+                ]);
+            }
+        }
+
+        foreach ($copies->slice(5, 3) as $i => $copy) {
+            $borrower = $borrowers->get($i + 5);
+            if (! $borrower) break;
+
+            $loanedAt = now()->subDays(25 + $i);
+            $dueOn = now()->subDays(10 + $i);
             Loan::create([
-                'copy_id'=>$copy->id, 'borrower_id'=>$borrowers[$i]->id, 'loaned_by'=>$user->id,
-                'loaned_at'=>now()->subDays($i === 0 ? $rule->loan_days + 4 : 3),
-                'due_on'=>$i === 0 ? now()->subDays(4)->toDateString() : now()->addDays($rule->loan_days - 3)->toDateString(),
-                'loan_rule_id'=>$rule->id, 'notes'=>'Movimentação fictícia de demonstração.', 'demo_batch'=>self::BATCH,
+                'copy_id' => $copy->id,
+                'borrower_id' => $borrower->id,
+                'loaned_by' => $user->id,
+                'loaned_at' => $loanedAt,
+                'due_on' => $dueOn->toDateString(),
+                'returned_at' => now()->subDays(6 + $i),
+                'returned_by' => $user->id,
+                'outcome' => 'returned',
+                'loan_rule_id' => $rule->id,
+                'notes' => 'Empréstimo devolvido de demonstração.',
+                'demo_batch' => self::BATCH,
             ]);
         }
-        foreach ($copies->slice(3, 3) as $i => $copy) {
-            Loan::create([
-                'copy_id'=>$copy->id, 'borrower_id'=>$borrowers[$i + 3]->id, 'loaned_by'=>$user->id,
-                'loaned_at'=>now()->subDays(30 + $i), 'due_on'=>now()->subDays(15 + $i)->toDateString(),
-                'returned_at'=>now()->subDays(10 + $i), 'returned_by'=>$user->id, 'outcome'=>'returned',
-                'loan_rule_id'=>$rule->id, 'notes'=>'Empréstimo devolvido de demonstração.', 'demo_batch'=>self::BATCH,
-            ]);
-        }
-        foreach ($books->take(2) as $i => $book) {
+
+        foreach ($books->take(3) as $i => $book) {
+            $borrower = $borrowers->get($i + 8);
+            if (! $borrower) break;
+
             Reservation::create([
-                'book_id'=>$book->id, 'borrower_id'=>$borrowers[$i + 6]->id, 'status'=>'waiting',
-                'requested_at'=>now()->subDays($i + 1), 'created_by'=>$user->id, 'demo_batch'=>self::BATCH,
+                'book_id' => $book->id,
+                'borrower_id' => $borrower->id,
+                'status' => $i === 2 ? 'cancelled' : 'waiting',
+                'requested_at' => now()->subDays($i + 1),
+                'created_by' => $user->id,
+                'cancel_reason' => $i === 2 ? 'Cancelado em demonstração' : null,
+                'demo_batch' => self::BATCH,
             ]);
         }
     }
