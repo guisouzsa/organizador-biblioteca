@@ -15,6 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // O Render encerra o TLS no balanceador e encaminha a requisição ao container por HTTP.
+        // Confiar nos cabeçalhos do proxy preserva o esquema HTTPS ao gerar URLs de assets e rotas.
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'active' => EnsureActiveUser::class,
             'password.changed' => ForcePasswordChange::class,
